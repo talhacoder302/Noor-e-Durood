@@ -5,7 +5,10 @@ import { ready } from "./ready";
 
 export type AppSettings = Omit<SettingsDoc, "_id">;
 
-const CACHE_MS = 30_000;
+// Short on purpose: route handlers and server actions are separate bundles
+// with separate copies of this cache, so an admin change reaches
+// submissions within this many milliseconds.
+const CACHE_MS = 10_000;
 let cached: { value: AppSettings; at: number } | null = null;
 
 function toSettings(doc: SettingsDoc): AppSettings {
