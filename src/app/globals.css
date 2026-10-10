@@ -1,0 +1,166 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+
+  /* Inter for English and all numbers, Nastaliq for Urdu, Amiri for Arabic */
+  --font-sans: var(--font-inter), var(--font-amiri), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-urdu: var(--font-nastaliq), var(--font-amiri), serif;
+  --font-arabic: var(--font-amiri), serif;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #fbf8f1;
+  --foreground: #17261d;
+  --card: #fffdf8;
+  --card-foreground: #17261d;
+  --popover: #fffdf8;
+  --popover-foreground: #17261d;
+  --primary: #0f5132;
+  --primary-foreground: #fbf8f1;
+  --secondary: #e7f0e9;
+  --secondary-foreground: #0f5132;
+  --muted: #f2ede1;
+  --muted-foreground: #56665c;
+  --accent: #f4e9c8;
+  --accent-foreground: #5b4710;
+  --destructive: #b42318;
+  --border: #e5dcc6;
+  --input: #ddd3bb;
+  --ring: #0f5132;
+  --brand: #0f5132;
+  --gold: #b08a2e;
+  --gold-soft: #e9d9a6;
+  --pattern-opacity: 0.07;
+}
+
+.dark {
+  --background: #0a1811;
+  --foreground: #ede8d8;
+  --card: #0f2219;
+  --card-foreground: #ede8d8;
+  --popover: #0f2219;
+  --popover-foreground: #ede8d8;
+  --primary: #1f7350;
+  --primary-foreground: #f7f3e7;
+  --secondary: #163428;
+  --secondary-foreground: #d5ecdf;
+  --muted: #13291e;
+  --muted-foreground: #9fb4a7;
+  --accent: #3a3216;
+  --accent-foreground: #f0d78f;
+  --destructive: #f0644f;
+  --border: #1f3a2d;
+  --input: #2a4a3a;
+  --ring: #4fb184;
+  --brand: #7fcca3;
+  --gold: #d6b25a;
+  --gold-soft: #5c4b1d;
+  --pattern-opacity: 0.06;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Nastaliq has tall ascenders and deep descenders; give it room so it is
+     never clipped. */
+  html[lang="ur"] body {
+    line-height: 2;
+  }
+}
+
+@layer components {
+  /* Faint original geometric pattern: eight-point stars (two overlapping
+     squares) joined on a square grid. Tinted with the gold token via a mask
+     so it follows light and dark mode. */
+  .islamic-pattern {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .islamic-pattern::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--gold);
+    opacity: var(--pattern-opacity);
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80' fill='none' stroke='black' stroke-width='1.2'%3E%3Cpath d='M40 14 66 40 40 66 14 40Z'/%3E%3Cpath d='M21.6 21.6h36.8v36.8H21.6Z'/%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3Cpath d='M0 0 21.6 21.6M80 0 58.4 21.6M0 80 21.6 58.4M80 80 58.4 58.4M40 0v14M40 66v14M0 40h14M66 40h14'/%3E%3C/svg%3E");
+    mask-size: 80px 80px;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80' fill='none' stroke='black' stroke-width='1.2'%3E%3Cpath d='M40 14 66 40 40 66 14 40Z'/%3E%3Cpath d='M21.6 21.6h36.8v36.8H21.6Z'/%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3Cpath d='M0 0 21.6 21.6M80 0 58.4 21.6M0 80 21.6 58.4M80 80 58.4 58.4M40 0v14M40 66v14M0 40h14M66 40h14'/%3E%3C/svg%3E");
+    -webkit-mask-size: 80px 80px;
+  }
+
+  /* Arabic text (Quranic/durood). Generous line height so harakat are never
+     cut, and no letter-spacing, which breaks joined letters. */
+  .arabic-text {
+    font-family: var(--font-arabic);
+    direction: rtl;
+    unicode-bidi: isolate;
+    line-height: 2.2;
+    letter-spacing: 0;
+    word-spacing: 0.05em;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    font-feature-settings: "kern", "liga", "calt";
+  }
+
+  /* Numbers stay left-to-right with Inter even inside Urdu text. */
+  .num {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+}
+
+@layer components {
+  .salawat {
+    font-family: var(--font-amiri), serif;
+    font-size: 1.15em;
+    font-style: normal;
+    line-height: 0;
+  }
+}
