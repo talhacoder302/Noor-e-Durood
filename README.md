@@ -40,10 +40,16 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, MongoDB At
 
    In Atlas, make sure your IP (or `0.0.0.0/0` for the host) is on the Network Access list.
 
-3. Create the database, collections and the global counter (safe to run again):
+3. Create the collections, the Settings document and the counters (safe to run again; it never touches existing counts):
 
    ```bash
-   npm run db:init
+   npm run db:seed
+   ```
+
+   To wipe everything and start every counter from 0 (deletes all entries):
+
+   ```bash
+   npm run db:seed -- --reset
    ```
 
 4. Start the dev server:
@@ -65,8 +71,23 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, MongoDB At
 | `npm start`         | Run the production build                     |
 | `npm run lint`      | ESLint                                       |
 | `npm run typecheck` | TypeScript check (`tsc --noEmit`)            |
-| `npm test`          | Unit tests (Vitest)                          |
-| `npm run db:init`   | Create the database and seed the global counter |
+| `npm test`          | Unit tests (Vitest, with an in-memory MongoDB) |
+| `npm run db:seed`   | Create collections, Settings and counters    |
+
+## API
+
+| Route | What it does |
+| --- | --- |
+| `GET /api/stats` | `{ total, today, month, dayKey }`, cached on the server for about 3 seconds |
+| `POST /api/durood` | Body `{ deviceId, count, mode, clientId }`. Adds a count and returns the new totals. A retry with the same `clientId` is never counted twice. |
+| `POST /api/device` | Links the browser's anonymous device id with its httpOnly cookie |
+| `GET /api/health` | Database check |
+
+Limits: up to 10,000 per entry and 100,000 per device per day (changeable in Settings), 30 requests per minute per device and 120 per IP.
+
+## Tests
+
+`npm test` runs the unit tests. The counter service tests start a throwaway MongoDB with mongodb-memory-server; the first run downloads a MongoDB binary (several hundred MB) into `node_modules/.cache`.
 
 ## Project layout
 
