@@ -4,7 +4,10 @@ import { Counter } from "@/models/counter";
 import { DeviceStat } from "@/models/device-stat";
 import { Entry } from "@/models/entry";
 import { RateLimit } from "@/models/rate-limit";
+import { Majlis } from "@/models/majlis";
+import { Session } from "@/models/session";
 import { Settings } from "@/models/settings";
+import { User } from "@/models/user";
 
 let indexes: Promise<unknown> | null = null;
 
@@ -20,6 +23,9 @@ export async function ready(): Promise<void> {
     DeviceStat.init(),
     RateLimit.init(),
     Settings.init(),
+    User.init(),
+    Session.init(),
+    Majlis.init(),
   ]).catch((error: unknown) => {
     indexes = null;
     throw error;

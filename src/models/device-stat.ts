@@ -7,8 +7,6 @@ export type DeviceStatDoc = {
   /** Karachi day that dayCount belongs to; used to enforce the daily limit. */
   day: string;
   dayCount: number;
-  /** SHA-256 of the recovery code (salted); the code itself is never stored. */
-  recoveryHash?: string;
   /** Set by an admin; blocked devices can't submit. */
   blocked?: boolean;
   blockedReason?: string;
@@ -22,7 +20,6 @@ const deviceStatSchema = new Schema<DeviceStatDoc>(
     lastEntryAt: { type: Date, required: true },
     day: { type: String, required: true },
     dayCount: { type: Number, required: true, default: 0 },
-    recoveryHash: { type: String },
     blocked: { type: Boolean },
     blockedReason: { type: String },
     blockedAt: { type: Date },
@@ -31,7 +28,6 @@ const deviceStatSchema = new Schema<DeviceStatDoc>(
 );
 
 deviceStatSchema.index({ deviceId: 1 }, { unique: true });
-deviceStatSchema.index({ recoveryHash: 1 }, { unique: true, sparse: true });
 deviceStatSchema.index({ blocked: 1 }, { sparse: true });
 
 export const DeviceStat: Model<DeviceStatDoc> =

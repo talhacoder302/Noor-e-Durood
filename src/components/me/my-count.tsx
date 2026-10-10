@@ -1,17 +1,18 @@
 "use client";
 
-import { RefreshCwIcon, Share2Icon } from "lucide-react";
+import { RefreshCwIcon, Settings2Icon, Share2Icon, UserRoundIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
+import { LoginPrompt } from "@/components/auth/login-prompt";
+import { setSessionUser, useSession } from "@/components/auth/session-store";
 import { applyPolled } from "@/components/counter/totals-store";
 import { ShareButtons } from "@/components/shared/share-buttons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getDeviceId, rememberDeviceId } from "@/lib/device-id";
+import { Link } from "@/i18n/navigation";
 import { formatCount, type NumberLocale } from "@/lib/format";
 import type { MySummary, Totals } from "@/lib/types";
-import { RecoveryCard } from "./recovery-card";
 import { WeekChart } from "./week-chart";
 
 type State =
@@ -19,13 +20,12 @@ type State =
   | { status: "error" }
   | { status: "ready"; summary: MySummary };
 
-async function loadSummary(): Promise<MySummary> {
-  const deviceId = await getDeviceId();
-  const res = await fetch(`/api/me?deviceId=${encodeURIComponent(deviceId)}`, { cache: "no-store" });
+/** The account's own numbers (all its phones). Null means the session ended. */
+async function loadSummary(): Promise<MySummary | null> {
+  const res = await fetch("/api/me", { cache: "no-store" });
+  if (res.status === 401) return null;
   if (!res.ok) throw new Error(`me ${res.status}`);
-  const data = (await res.json()) as { deviceId: string; summary: MySummary };
-  rememberDeviceId(data.deviceId);
-  return data.summary;
+  return ((await res.json()) as { summary: MySummary }).summary;
 }
 
 function Stat({ label, value }: { label: string; value: number | null }) {
@@ -46,29 +46,49 @@ function Stat({ label, value }: { label: string; value: number | null }) {
 
 export function MyCount() {
   const t = useTranslations("Me");
+  const session = useSession();
   const [state, setState] = useState<State>({ status: "loading" });
   const [sharing, setSharing] = useState(false);
+  const userId = session.status === "user" ? session.user.id : null;
 
   const refresh = useCallback(() => {
     loadSummary().then(
-      (summary) => setState({ status: "ready", summary }),
+      (summary) => (summary ? setState({ status: "ready", summary }) : setSessionUser(null)),
       () => setState({ status: "error" }),
     );
   }, []);
 
   useEffect(() => {
+    if (!userId) return;
     refresh();
     // The shared total is only used inside an optional share message.
     fetch("/api/stats")
       .then((r) => (r.ok ? (r.json() as Promise<Totals>) : null))
       .then((totals) => totals && applyPolled(totals))
       .catch(() => {});
-  }, [refresh]);
+  }, [userId, refresh]);
+
+  if (session.status === "guest") return <LoginPrompt message={t("loginToSee")} />;
 
   const s = state.status === "ready" ? state.summary : null;
 
   return (
     <div className="space-y-5">
+      {session.status === "user" && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border bg-card px-4 py-2">
+          <span className="flex min-w-0 items-center gap-2 text-sm">
+            <UserRoundIcon className="size-4 shrink-0 text-brand" />
+            <span className="truncate">{session.user.name || <span className="num">{session.user.phoneMasked}</span>}</span>
+          </span>
+          <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5 rounded-full">
+            <Link href="/profile">
+              <Settings2Icon className="size-4" />
+              {t("settings")}
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {state.status === "error" ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-6 text-center">
@@ -115,8 +135,6 @@ export function MyCount() {
           </CardContent>
         </Card>
       )}
-
-      {s && <RecoveryCard hasCode={s.hasRecoveryCode} onRestored={refresh} />}
     </div>
   );
 }
