@@ -1,0 +1,41 @@
+{
+  "Meta": {
+    "title": "Noor-e-Durood — Send Durood together",
+    "description": "Recite Durood Shareef upon the Holy Prophet Muhammad ﷺ and add your count. Everyone's durood adds up to one shared total."
+  },
+  "Header": {
+    "name": "Noor-e-Durood",
+    "nameLatin": "نورِ درود",
+    "home": "Home",
+    "switchLanguage": "اردو",
+    "switchLanguageLabel": "View in Urdu",
+    "toggleTheme": "Toggle light or dark mode"
+  },
+  "Hero": {
+    "eyebrow": "Durood Shareef",
+    "title": "Let us send Durood and Salaam upon the Holy Prophet ﷺ together",
+    "subtitle": "However much durood you recite, add it here. Together, every count becomes one light.",
+    "shortDuroodLabel": "Short Durood",
+    "shortDuroodTranslation": "May Allah send blessings and peace upon him ﷺ and his family."
+  },
+  "Counter": {
+    "total": "Total durood sent so far",
+    "today": "Today",
+    "month": "This month",
+    "comingSoon": "The live count will appear here soon"
+  },
+  "Actions": {
+    "tasbeeh": "Tasbeeh",
+    "number": "Enter a number",
+    "submit": "Jama karein"
+  },
+  "Footer": {
+    "dua": "May Allah accept the durood of all of us. Ameen",
+    "privacy": "No names or personal counts are ever shown to anyone here.",
+    "share": "Share"
+  },
+  "NotFound": {
+    "title": "This page could not be found",
+    "back": "Go to the home page"
+  }
+}
