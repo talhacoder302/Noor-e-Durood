@@ -57,6 +57,12 @@ export function getDeviceId(): Promise<string> {
   return pending;
 }
 
+/** Stored id without any network call (for page-unload beacons). */
+export function peekDeviceId(): string | null {
+  const stored = read();
+  return isUuid(stored) ? stored : null;
+}
+
 /** The server decides the effective id (cookie wins); keep storage in step. */
 export function rememberDeviceId(id: string) {
   if (!isUuid(id)) return;
