@@ -1,4 +1,5 @@
 import "server-only";
+import { DEFAULT_FRIDAY_MESSAGE } from "@/lib/friday";
 import { Settings, SETTINGS_ID, type SettingsDoc } from "@/models/settings";
 import { ready } from "./ready";
 
@@ -11,8 +12,11 @@ function toSettings(doc: SettingsDoc): AppSettings {
   return {
     maxPerEntry: doc.maxPerEntry,
     maxPerDevicePerDay: doc.maxPerDevicePerDay,
-    announcement: doc.announcement,
+    announcement: doc.announcement ?? "",
     paused: doc.paused,
+    // Older documents may not have these fields yet.
+    fridayMessageUr: doc.fridayMessageUr || DEFAULT_FRIDAY_MESSAGE.ur,
+    fridayMessageEn: doc.fridayMessageEn || DEFAULT_FRIDAY_MESSAGE.en,
   };
 }
 

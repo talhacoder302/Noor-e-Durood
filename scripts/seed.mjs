@@ -29,6 +29,9 @@ const SETTINGS_DEFAULTS = {
   maxPerDevicePerDay: 100_000,
   announcement: "",
   paused: false,
+  // Empty means the built-in Friday text (src/lib/friday.ts).
+  fridayMessageUr: "",
+  fridayMessageEn: "",
 };
 
 function karachiDay(date = new Date()) {
@@ -87,6 +90,13 @@ try {
     await counters.updateOne({ _id }, { $setOnInsert: { count: 0 } }, { upsert: true });
   }
   console.log(`  counters ready: ${counterIds.join(", ")}`);
+
+  // Add fields introduced after the document was first created.
+  for (const [key, value] of Object.entries(SETTINGS_DEFAULTS)) {
+    await db
+      .collection("settings")
+      .updateOne({ _id: "settings", [key]: { $exists: false } }, { $set: { [key]: value } });
+  }
 
   const settings = await db
     .collection("settings")

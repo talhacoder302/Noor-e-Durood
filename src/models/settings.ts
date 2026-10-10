@@ -12,6 +12,9 @@ export type SettingsDoc = {
   maxPerDevicePerDay: number;
   announcement: string;
   paused: boolean;
+  /** Friday banner text; empty means the built-in default. */
+  fridayMessageUr: string;
+  fridayMessageEn: string;
 };
 
 const settingsSchema = new Schema<SettingsDoc>(
@@ -25,6 +28,8 @@ const settingsSchema = new Schema<SettingsDoc>(
     },
     announcement: { type: String, default: "" },
     paused: { type: Boolean, default: false },
+    fridayMessageUr: { type: String, default: "" },
+    fridayMessageEn: { type: String, default: "" },
   },
   { collection: "settings", versionKey: false },
 );
