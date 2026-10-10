@@ -45,3 +45,7 @@ next-env.d.ts
 CLAUDE.md
 AGENTS.md
 .claude/
+
+# service worker (built by scripts/build-sw.mjs)
+/public/sw.js
+/public/sw.js.map
