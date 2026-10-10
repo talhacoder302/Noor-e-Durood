@@ -1,10 +1,11 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { use } from "react";
-import { CounterPlaceholder } from "@/components/counter/counter-placeholder";
-import { ShortDurood } from "@/components/shared/short-durood";
+import { Suspense, use } from "react";
+import { InitialCounter } from "@/components/counter/initial-counter";
+import { LiveCounterSkeleton } from "@/components/counter/live-counter";
+import { NumberEntry } from "@/components/counter/number-entry";
+import { DuroodCard } from "@/components/shared/durood-card";
 import { SalawatText } from "@/components/shared/salawat-text";
-import { Badge } from "@/components/ui/badge";
 import type { Locale } from "@/i18n/routing";
 
 export default function HomePage({
@@ -18,24 +19,22 @@ export default function HomePage({
   const t = useTranslations("Hero");
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 pt-8 pb-12 sm:pt-12">
-      <section className="flex flex-col items-center gap-4 text-center">
-        <Badge
-          variant="outline"
-          className="border-gold/40 bg-accent/60 px-3 py-1 text-accent-foreground"
-        >
-          {t("eyebrow")}
-        </Badge>
-        <h1 className="text-2xl leading-[1.9] font-semibold text-balance text-brand sm:text-3xl">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-6 pb-12 sm:pt-10">
+      <section className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-xl leading-[1.9] font-semibold text-balance text-brand sm:text-3xl">
           <SalawatText>{t("title")}</SalawatText>
         </h1>
-        <p className="max-w-xl text-base text-pretty text-muted-foreground">
+        <p className="max-w-xl text-sm text-pretty text-muted-foreground sm:text-base">
           <SalawatText>{t("subtitle")}</SalawatText>
         </p>
       </section>
 
-      <CounterPlaceholder />
-      <ShortDurood />
+      <Suspense fallback={<LiveCounterSkeleton />}>
+        <InitialCounter />
+      </Suspense>
+
+      <NumberEntry />
+      <DuroodCard />
     </div>
   );
 }
