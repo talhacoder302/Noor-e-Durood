@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/admin", key: "navDashboard" },
   { href: "/admin/entries", key: "navEntries" },
+  { href: "/admin/users", key: "navUsers" },
+  { href: "/admin/majalis", key: "navMajalis" },
   { href: "/admin/settings", key: "navSettings" },
 ] as const;
 

@@ -22,6 +22,8 @@ const blank = (v: unknown) => (v === "" || Array.isArray(v) ? undefined : v);
 const filterSchema = z.object({
   min: z.preprocess(blank, z.coerce.number().int().min(1).max(1e9).optional()),
   device: z.preprocess(blank, z.string().regex(/^[0-9a-fA-F-]{1,36}$/).optional()),
+  user: z.preprocess(blank, z.string().regex(/^[0-9a-f]{24}$/).optional()),
+  phone: z.preprocess(blank, z.string().trim().max(32).optional()),
   hours: z.preprocess(blank, z.coerce.number().int().refine((h) => (HOURS as readonly number[]).includes(h)).optional()),
   removed: z.preprocess(blank, z.literal("1").optional()),
   before: z.preprocess(blank, z.iso.datetime().optional()),
@@ -34,13 +36,15 @@ async function Entries({ searchParams, locale }: { searchParams: Promise<SearchP
   const { entries, nextBefore } = await listEntries({
     minCount: f.min,
     device: f.device,
+    userId: f.user,
+    phone: f.phone,
     hours: f.hours,
     showRemoved: f.removed === "1",
     before: f.before ? new Date(f.before) : undefined,
   });
 
   const query = Object.fromEntries(
-    Object.entries({ min: f.min, device: f.device, hours: f.hours, removed: f.removed }).filter(([, v]) => v !== undefined),
+    Object.entries({ min: f.min, device: f.device, user: f.user, phone: f.phone, hours: f.hours, removed: f.removed }).filter(([, v]) => v !== undefined),
   ) as Record<string, string>;
 
   return (
@@ -51,9 +55,12 @@ async function Entries({ searchParams, locale }: { searchParams: Promise<SearchP
           <Input name="min" type="number" min={1} defaultValue={f.min} dir="ltr" className="h-9" />
         </label>
         <label className="space-y-1 text-xs">
-          <span>{t("filterDevice")}</span>
-          <Input name="device" defaultValue={f.device} dir="ltr" className="h-9" placeholder="a1b2c3d4" />
+          <span>{t("filterPhone")}</span>
+          <Input name="phone" type="tel" defaultValue={f.phone} dir="ltr" className="h-9" placeholder="03001234567" />
         </label>
+        {/* Kept when coming from a link (a user's or an old device's entries). */}
+        {f.user && <input type="hidden" name="user" value={f.user} />}
+        {f.device && <input type="hidden" name="device" value={f.device} />}
         <label className="space-y-1 text-xs">
           <span>{t("filterTime")}</span>
           <select

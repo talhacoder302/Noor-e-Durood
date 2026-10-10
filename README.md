@@ -1,6 +1,6 @@
 # Noor-e-Durood (نورِ درود)
 
-A simple web app where people send Durood Shareef upon the Holy Prophet Muhammad ﷺ and add their count. Everyone sees one live, shared total. No login needed.
+A simple web app where people send Durood Shareef upon the Holy Prophet Muhammad ﷺ and add their count. Everyone sees one live, shared total. Anyone can watch; adding durood needs a simple account (mobile number + 4-digit PIN).
 
 Urdu by default (right-to-left), with English at `/en`. Built for phones and slow mobile internet, and it keeps counting offline.
 
@@ -18,7 +18,8 @@ Urdu by default (right-to-left), with English at `/en`. Built for phones and slo
 - **Number mode**: type how many you recited (Urdu digits work too) with quick +11 / +33 / +100 / +313 / +1000 buttons.
 - Taps are saved on the phone and sent in batches; nothing is lost offline or on a bad connection, and nothing is ever counted twice.
 - Durood Ibrahimi and the short durood in Arabic with Urdu (or English) translation.
-- **میرا حساب (My count)**: your own today / week / month / all-time count and a 7-day chart. An optional recovery code links a second phone. No login.
+- **Accounts**: sign up with a mobile number and a 4-digit PIN, nothing else. Optional profile: name, majlis (from the admin's list or "other"), age, city. One account works on every phone; durood counted on a phone before signing up moves into the account.
+- **میرا حساب (My count)**: your own today / week / month / all-time count and a 7-day chart, across all your phones.
 - Share on WhatsApp or the phone's share sheet; a live preview image shows the total.
 - Friday reminder banner, announcements and a gentle "paused" notice from the admin.
 - Installable app (PWA) with an offline page where the tasbeeh still works.
@@ -26,7 +27,9 @@ Urdu by default (right-to-left), with English at `/en`. Built for phones and slo
 
 **For the admin** (`/admin`, one password)
 - Dashboard: total, today, month, active devices today, entries per hour today, last 30 days, and the largest recent entries (device id shortened, never an IP).
-- Entries list with filters (size, device, time). Remove an entry with a reason: its count is taken back off every total. Block a device from submitting.
+- Entries list with filters (size, mobile number, time), showing who sent each one. Remove an entry with a reason: its count is taken back off every total.
+- Users: search by number or name, filter by majlis, reset a forgotten PIN, disable or enable an account.
+- Majalis: add, edit, reorder and deactivate the list users choose from. The dashboard shows this month's totals per majlis.
 - Settings: limits per entry and per device per day, announcement, Friday text (Urdu and English), pause submissions.
 - "Recalculate totals" rebuilds every counter from the entries (a safety tool).
 
@@ -58,7 +61,7 @@ Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind CSS v4 · sh
    | ---------------------- | ----------------- |
    | `MONGODB_URI`          | Atlas connection string (`mongodb+srv://...`) |
    | `MONGODB_DB`           | Database name, `noor_e_durood` by default |
-   | `IP_HASH_SALT`         | Long random string (at least 16 characters) used to hash IPs and recovery codes |
+   | `IP_HASH_SALT`         | Long random string (at least 16 characters) used to hash IPs |
    | `ADMIN_PASSWORD`       | Admin password: a bcrypt hash from `npm run admin:hash` (recommended) or plain text (8+ characters) |
    | `NEXT_PUBLIC_SITE_URL` | Public site URL, e.g. `http://localhost:3000` in development |
 
@@ -113,24 +116,28 @@ Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind CSS v4 · sh
 | `POST /api/durood` | Body `{ deviceId, count, mode, clientId }`. Adds a count and returns the new totals. A retry with the same `clientId` is never counted twice. |
 | `POST /api/device` | Links the browser's anonymous device id with its httpOnly cookie |
 | `GET /api/me?deviceId=` | This device's own counts and last 7 days (private, never cached) |
-| `POST /api/recovery` | Makes (or replaces) this device's recovery code; only a hash is stored |
-| `POST /api/recovery/restore` | Body `{ deviceId, code }`. Links this phone to the code's count |
+| `POST /api/auth/signup` · `POST /api/auth/login` | Body `{ phone, pin }`. Creates or opens an account and sets the session cookie |
+| `POST /api/auth/logout` | Logs out this phone, or every phone with `{ all: true }` |
+| `GET /api/auth/me` | The logged-in user (masked number, profile) or `null` |
+| `POST /api/auth/pin` | Body `{ oldPin, newPin }` |
+| `POST /api/profile` | Body `{ name, majlis, majlisOther, age, city }` (all optional) |
+| `GET /api/majalis` | The active majlis list for the profile form |
 | `GET /api/health` | Database check |
 
 Admin actions are Server Actions, each checking the admin session first.
 
 ## Privacy and security
 
-- No accounts. Each phone gets an anonymous random id (localStorage + httpOnly cookie).
+- Accounts are a mobile number + 4-digit PIN (bcrypt-hashed). Wrong PINs lock the account for 15 minutes after 5 tries, 1 hour after 10, 24 hours after 15. Sessions are random tokens in an httpOnly cookie; only their hash is stored. No OTP yet, so the admin resets forgotten PINs.
 - IPs are never stored, only a salted SHA-256 hash used for rate limits. Device ids are never shown publicly.
 - Every input is validated with Zod. Totals only change with atomic `$inc`; each submission has a unique id, so retries can't double count.
-- Rate limits: 30 submissions per minute per device and 120 per IP; 5 admin logins per 15 minutes per IP; recovery-code guesses are limited too.
+- Rate limits: 30 submissions per minute per account and 120 per IP; 20 logins per 15 minutes and 5 sign-ups per hour per IP; 5 admin logins per 15 minutes per IP.
 - Admin: bcrypt-checked password, signed httpOnly `SameSite=Strict` session cookie (12 hours).
 - Security headers: Content-Security-Policy, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
 
 ## Tests
 
-`npm test` runs the unit tests: number formatting, Karachi dates, the offline tap queue, the counter service (atomic increments, idempotency, limits), personal counts and recovery codes, and the admin tools. The service tests start a throwaway MongoDB with mongodb-memory-server; the first run downloads a MongoDB binary (several hundred MB) into `node_modules/.cache`.
+`npm test` runs the unit tests: number formatting, Karachi dates, the offline tap queue, the counter service (atomic increments, idempotency, limits), accounts (sign-up, login, lockouts, PIN changes, profiles), personal counts, and the admin tools. The service tests start a throwaway MongoDB with mongodb-memory-server; the first run downloads a MongoDB binary (several hundred MB) into `node_modules/.cache`.
 
 ## Project layout
 

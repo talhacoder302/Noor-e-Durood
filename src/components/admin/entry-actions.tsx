@@ -1,10 +1,15 @@
 "use client";
 
-import { BanIcon, Loader2Icon, Trash2Icon } from "lucide-react";
+import { BanIcon, KeyRoundIcon, Loader2Icon, Trash2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import { toast } from "sonner";
-import { blockDeviceAction, removeEntryAction, type ActionState } from "@/app/[locale]/admin/actions";
+import {
+  disableUserAction,
+  removeEntryAction,
+  resetPinAction,
+  type ActionState,
+} from "@/app/[locale]/admin/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,7 +24,13 @@ import { Input } from "@/components/ui/input";
 
 const IDLE: ActionState = { status: "idle" };
 
-function ReasonDialog({
+const ERROR_KEYS: Record<string, string> = {
+  already_removed: "alreadyRemoved",
+  invalid_pin: "invalidPin",
+};
+
+/** A small dialog with one text field (a reason or a new PIN) and a confirm button. */
+function FieldDialog({
   trigger,
   title,
   description,
@@ -27,6 +38,8 @@ function ReasonDialog({
   hidden,
   action,
   successMessage,
+  field = { name: "reason", minLength: 3, maxLength: 200 },
+  destructive = true,
 }: {
   trigger: React.ReactNode;
   title: string;
@@ -35,6 +48,8 @@ function ReasonDialog({
   hidden: Record<string, string>;
   action: (prev: ActionState, form: FormData) => Promise<ActionState>;
   successMessage: string;
+  field?: { name: string; minLength: number; maxLength: number; numeric?: boolean; placeholder?: string };
+  destructive?: boolean;
 }) {
   const t = useTranslations("Admin");
   const [open, setOpen] = useState(false);
@@ -44,7 +59,7 @@ function ReasonDialog({
       toast.success(successMessage);
       setOpen(false);
     } else if (result.status === "error") {
-      toast.error(t(result.code === "already_removed" ? "alreadyRemoved" : "invalidInput"));
+      toast.error(t(ERROR_KEYS[result.code ?? ""] ?? "invalidInput"));
     }
     return result;
   }, IDLE);
@@ -61,9 +76,18 @@ function ReasonDialog({
           {Object.entries(hidden).map(([name, value]) => (
             <input key={name} type="hidden" name={name} value={value} />
           ))}
-          <Input name="reason" required minLength={3} maxLength={200} placeholder={t("reasonPlaceholder")} />
+          <Input
+            name={field.name}
+            required
+            minLength={field.minLength}
+            maxLength={field.maxLength}
+            inputMode={field.numeric ? "numeric" : undefined}
+            dir={field.numeric ? "ltr" : undefined}
+            className={field.numeric ? "num text-center text-xl tracking-[0.5em]" : undefined}
+            placeholder={field.placeholder ?? t("reasonPlaceholder")}
+          />
           <DialogFooter>
-            <Button type="submit" variant="destructive" disabled={pending}>
+            <Button type="submit" variant={destructive ? "destructive" : "default"} disabled={pending}>
               {pending && <Loader2Icon className="size-4 animate-spin" />}
               {confirm}
             </Button>
@@ -74,45 +98,64 @@ function ReasonDialog({
   );
 }
 
-export function EntryActions({ id, deviceId, count }: { id: string; deviceId: string; count: string }) {
+export function RemoveEntryButton({ id, count }: { id: string; count: string }) {
   const t = useTranslations("Admin");
   return (
-    <div className="flex flex-wrap gap-2">
-      <ReasonDialog
-        trigger={
-          <Button type="button" variant="outline" size="sm" className="gap-1.5">
-            <Trash2Icon className="size-4" />
-            {t("remove")}
-          </Button>
-        }
-        title={t("removeTitle")}
-        description={t("removeBody", { count })}
-        confirm={t("removeConfirm")}
-        hidden={{ id }}
-        action={removeEntryAction}
-        successMessage={t("removed")}
-      />
-      <BlockButton deviceId={deviceId} />
-    </div>
+    <FieldDialog
+      trigger={
+        <Button type="button" variant="outline" size="sm" className="gap-1.5">
+          <Trash2Icon className="size-4" />
+          {t("remove")}
+        </Button>
+      }
+      title={t("removeTitle")}
+      description={t("removeBody", { count })}
+      confirm={t("removeConfirm")}
+      hidden={{ id }}
+      action={removeEntryAction}
+      successMessage={t("removed")}
+    />
   );
 }
 
-export function BlockButton({ deviceId }: { deviceId: string }) {
+export function DisableUserButton({ userId, label }: { userId: string; label: string }) {
   const t = useTranslations("Admin");
   return (
-    <ReasonDialog
+    <FieldDialog
       trigger={
         <Button type="button" variant="outline" size="sm" className="gap-1.5">
           <BanIcon className="size-4" />
-          {t("block")}
+          {t("disableUser")}
         </Button>
       }
-      title={t("blockTitle")}
-      description={t("blockBody", { device: deviceId.slice(0, 8) })}
-      confirm={t("blockConfirm")}
-      hidden={{ deviceId }}
-      action={blockDeviceAction}
-      successMessage={t("blocked")}
+      title={t("disableTitle")}
+      description={t("disableBody", { user: label })}
+      confirm={t("disableConfirm")}
+      hidden={{ userId }}
+      action={disableUserAction}
+      successMessage={t("userDisabled")}
+    />
+  );
+}
+
+export function ResetPinButton({ userId, label }: { userId: string; label: string }) {
+  const t = useTranslations("Admin");
+  return (
+    <FieldDialog
+      trigger={
+        <Button type="button" variant="outline" size="sm" className="gap-1.5">
+          <KeyRoundIcon className="size-4" />
+          {t("resetPin")}
+        </Button>
+      }
+      title={t("resetPinTitle")}
+      description={t("resetPinBody", { user: label })}
+      confirm={t("resetPinConfirm")}
+      hidden={{ userId }}
+      action={resetPinAction}
+      successMessage={t("pinReset")}
+      field={{ name: "pin", minLength: 4, maxLength: 4, numeric: true, placeholder: "••••" }}
+      destructive={false}
     />
   );
 }

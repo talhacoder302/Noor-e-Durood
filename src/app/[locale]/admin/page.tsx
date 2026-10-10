@@ -34,9 +34,11 @@ async function Dashboard({ locale }: { locale: NumberLocale }) {
         <Stat label={t("total")} value={d.totals.total} locale={locale} />
         <Stat label={t("today")} value={d.totals.today} locale={locale} />
         <Stat label={t("month")} value={d.totals.month} locale={locale} />
-        <Stat label={t("activeDevices")} value={d.activeDevicesToday} locale={locale} />
         <Stat label={t("entriesToday")} value={d.entriesToday} locale={locale} />
-        <Stat label={t("blockedDevices")} value={d.blockedDevices} locale={locale} />
+        <Stat label={t("users")} value={d.users} locale={locale} />
+        <Stat label={t("newUsersToday")} value={d.newUsersToday} locale={locale} />
+        <Stat label={t("activeUsers")} value={d.activeUsersToday} locale={locale} />
+        <Stat label={t("disabledUsers")} value={d.disabledUsers} locale={locale} />
       </div>
 
       <Card>
@@ -59,6 +61,36 @@ async function Dashboard({ locale }: { locale: NumberLocale }) {
           />
         </CardContent>
       </Card>
+
+      <section className="space-y-3">
+        <h2 className="text-lg leading-loose font-semibold">{t("majlisThisMonth")}</h2>
+        {d.majlisThisMonth.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noEntries")}</p>
+        ) : (
+          <Card className="gap-0 py-0">
+            <CardContent className="px-0">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-xs text-muted-foreground">
+                    <th className="px-4 py-2 text-start font-medium">{t("majlis")}</th>
+                    <th className="px-4 py-2 text-end font-medium">{t("usersCol")}</th>
+                    <th className="px-4 py-2 text-end font-medium">{t("durood")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.majlisThisMonth.map((m) => (
+                    <tr key={m.id ?? "none"} className="border-b last:border-0">
+                      <td className="px-4 py-2">{m.name ?? t("noMajlis")}</td>
+                      <td className="num px-4 py-2 text-end">{formatCount(m.users, locale)}</td>
+                      <td className="num px-4 py-2 text-end font-semibold">{formatCount(m.count, locale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        )}
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-lg leading-loose font-semibold">{t("topEntries")}</h2>

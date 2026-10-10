@@ -50,7 +50,16 @@ function karachiDay(date = new Date()) {
 
 const day = karachiDay();
 const counterIds = ["global", `day:${day}`, `month:${day.slice(0, 7)}`];
-const collections = ["counters", "entries", "devicestats", "settings", "ratelimits"];
+const collections = [
+  "counters",
+  "entries",
+  "devicestats",
+  "settings",
+  "ratelimits",
+  "users",
+  "sessions",
+  "majalis",
+];
 
 try {
   await mongoose.connect(uri, { dbName, serverSelectionTimeoutMS: 10_000 });
@@ -71,11 +80,13 @@ try {
 
   if (reset) {
     await Promise.all(
-      ["counters", "entries", "devicestats", "ratelimits"].map((name) =>
+      ["counters", "entries", "devicestats", "ratelimits", "sessions"].map((name) =>
         db.collection(name).deleteMany({}),
       ),
     );
-    console.log("  reset: cleared counters, entries, devicestats, ratelimits");
+    // Accounts and majalis are kept; only counts and logins are reset.
+    await db.collection("users").updateMany({}, { $set: { totalCount: 0, dayCount: 0 } });
+    console.log("  reset: cleared counters, entries, devicestats, ratelimits, sessions; user totals set to 0");
   } else {
     const global = await counters.findOne({ _id: "global" });
     if (global?.count > 0) {

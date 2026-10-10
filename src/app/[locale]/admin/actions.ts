@@ -5,10 +5,10 @@ import { cookies, headers } from "next/headers";
 import { z } from "zod";
 import { ABSOLUTE_MAX_PER_ENTRY } from "@/lib/limits";
 import {
-  blockDevice,
   recalculateTotals,
   removeEntry,
-  unblockDevice,
+  resetUserPin,
+  setUserDisabled,
   type RecalcResult,
 } from "@/server/admin";
 import {
@@ -17,6 +17,7 @@ import {
   attemptAdminLogin,
   requireAdmin,
 } from "@/server/admin-auth";
+import { createMajlis, MAJALIS_TAG, updateMajlis } from "@/server/majalis";
 import { PUBLIC_SETTINGS_TAG } from "@/server/public-settings";
 import { getClientIp, hashIp } from "@/server/request-meta";
 import { updateSettings } from "@/server/settings";
@@ -26,6 +27,7 @@ import { updateSettings } from "@/server/settings";
 export type ActionState = { status: "idle" | "ok" | "error"; code?: string; detail?: string };
 
 const reason = z.string().trim().min(3).max(200);
+const objectId = z.string().regex(/^[0-9a-f]{24}$/);
 
 export async function loginAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const parsed = z.object({ password: z.string().min(1).max(200) }).safeParse({
@@ -49,7 +51,7 @@ export async function logoutAction(): Promise<void> {
 export async function removeEntryAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   await requireAdmin();
   const parsed = z
-    .object({ id: z.string().regex(/^[0-9a-f]{24}$/), reason })
+    .object({ id: objectId, reason })
     .safeParse({ id: form.get("id"), reason: form.get("reason") });
   if (!parsed.success) return { status: "error", code: "invalid" };
 
@@ -59,24 +61,81 @@ export async function removeEntryAction(_prev: ActionState, form: FormData): Pro
   return { status: "ok", detail: String(result.count) };
 }
 
-export async function blockDeviceAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+/** Turns an account off (no logins, no submissions) with a reason. */
+export async function disableUserAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   await requireAdmin();
   const parsed = z
-    .object({ deviceId: z.uuid(), reason })
-    .safeParse({ deviceId: form.get("deviceId"), reason: form.get("reason") });
+    .object({ userId: objectId, reason })
+    .safeParse({ userId: form.get("userId"), reason: form.get("reason") });
   if (!parsed.success) return { status: "error", code: "invalid" };
 
-  await blockDevice(parsed.data.deviceId, parsed.data.reason);
+  await setUserDisabled(parsed.data.userId, true, parsed.data.reason);
   refresh();
   return { status: "ok" };
 }
 
-export async function unblockDeviceAction(form: FormData): Promise<void> {
+export async function enableUserAction(form: FormData): Promise<void> {
   await requireAdmin();
-  const parsed = z.uuid().safeParse(form.get("deviceId"));
+  const parsed = objectId.safeParse(form.get("userId"));
   if (!parsed.success) return;
-  await unblockDevice(parsed.data);
+  await setUserDisabled(parsed.data, false);
   refresh();
+}
+
+/** "Forgot my PIN": the admin sets a new 4-digit PIN and tells the user. */
+export async function resetPinAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const parsed = z
+    .object({ userId: objectId, pin: z.string().trim().min(1).max(12) })
+    .safeParse({ userId: form.get("userId"), pin: form.get("pin") });
+  if (!parsed.success) return { status: "error", code: "invalid" };
+
+  const result = await resetUserPin(parsed.data.userId, parsed.data.pin);
+  if (!result.ok) return { status: "error", code: result.error };
+  refresh();
+  return { status: "ok" };
+}
+
+const majlisSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  nameEn: z.string().trim().max(80),
+  city: z.string().trim().max(60),
+  order: z.coerce.number().int().min(0).max(9999),
+});
+
+export async function createMajlisAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const parsed = majlisSchema.safeParse({
+    name: form.get("name"),
+    nameEn: form.get("nameEn") ?? "",
+    city: form.get("city") ?? "",
+    order: form.get("order") || 0,
+  });
+  if (!parsed.success) return { status: "error", code: "invalid", detail: parsed.error.issues[0]?.path.join(".") };
+
+  await createMajlis(parsed.data);
+  updateTag(MAJALIS_TAG);
+  refresh();
+  return { status: "ok" };
+}
+
+export async function updateMajlisAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const parsed = majlisSchema.extend({ id: objectId, active: z.boolean() }).safeParse({
+    id: form.get("id"),
+    name: form.get("name"),
+    nameEn: form.get("nameEn") ?? "",
+    city: form.get("city") ?? "",
+    order: form.get("order") || 0,
+    active: form.get("active") === "on",
+  });
+  if (!parsed.success) return { status: "error", code: "invalid", detail: parsed.error.issues[0]?.path.join(".") };
+
+  const { id, ...patch } = parsed.data;
+  await updateMajlis(id, patch);
+  updateTag(MAJALIS_TAG);
+  refresh();
+  return { status: "ok" };
 }
 
 const settingsSchema = z.object({
