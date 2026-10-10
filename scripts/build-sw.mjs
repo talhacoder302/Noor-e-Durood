@@ -13,7 +13,17 @@ const { manifestEntries, count, size, warnings } = await getManifest({
   // All font files too: Amiri isn't preloaded, but the offline page needs it.
   // This happens in the background after the first visit.
   globPatterns: ["static/**/*.{js,css,woff2}"],
+  // Visitors never need the admin pages offline.
+  globIgnores: ["static/chunks/app/**/admin/**"],
   modifyURLPrefix: { "static/": "/_next/static/" },
+  // Webpack chunk paths contain "[locale]"; browsers request them as
+  // "%5Blocale%5D", so store them that way or the offline lookup misses.
+  manifestTransforms: [
+    (entries) => ({
+      manifest: entries.map((e) => ({ ...e, url: e.url.replaceAll("[", "%5B").replaceAll("]", "%5D") })),
+      warnings: [],
+    }),
+  ],
   // File names under /_next/static are already content-hashed.
   dontCacheBustURLsMatching: /^\/_next\/static\//,
   maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,

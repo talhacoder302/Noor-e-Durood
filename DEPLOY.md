@@ -72,7 +72,9 @@ It only creates what is missing and never touches existing counts, so it is safe
    - `NEXT_PUBLIC_SITE_URL` is baked in **at build time** (share links, sitemap, preview images). If you change it, redeploy.
    - Don't set `NODE_ENV` or `PORT` yourself. Hostinger provides the port and `next start` reads `PORT` automatically.
 
-5. Click **Deploy** and watch the build log under **Deployments**. A good build ends with `✓ Service worker: public/sw.js …`.
+5. Click **Deploy** and watch the build log under **Deployments**. A good build shows `▲ Next.js … (webpack)` near the top and ends with `✓ Service worker: public/sw.js …`.
+
+   The production build uses **webpack** on purpose (`next build --webpack`). Turbopack runs CSS processing in a helper process that has to connect back over a local socket, and on Hostinger's build servers that helper exits immediately (the "TurbopackInternalError … evaluate_webpack_loader / PostCssTransformedAsset" failure). Webpack does it in-process. The build also needs no database access and no dev dependencies, so it works however Hostinger installs packages.
 
 ## 5. Domain or subdomain, and SSL
 
@@ -100,7 +102,8 @@ Push to `main`. Hostinger rebuilds and restarts automatically (look for the **Au
 
 | Problem | What to check |
 | --- | --- |
-| Build fails | The build log under Deployments. Node.js version (22+). All environment variables present. |
+| Build fails | The build log under Deployments. Node.js version (22+). Make sure the log says `(webpack)`; if it says `(Turbopack)`, the build command isn't running the project's `build` script. |
+| `TurbopackInternalError` mentioning `globals.css` / PostCSS | The build ran with Turbopack. Set the build command to `build` (the npm script uses `next build --webpack`), then Redeploy. |
 | `Invalid environment variables` in logs | The message lists the variable names that are missing or wrong. |
 | `/api/health` says `"db":"down"` | Atlas Network Access (step 1.2), the user's password in `MONGODB_URI`, and that the cluster isn't paused. |
 | Admin password not accepted | `ADMIN_PASSWORD` must be the exact hash, starting `$2b$12$`, with nothing else around it. Wait 15 minutes after 5 wrong tries. |
