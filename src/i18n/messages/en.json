@@ -41,6 +41,34 @@
       "server": "Something went wrong. Please try again."
     }
   },
+  "Add": {
+    "label": "How to add durood",
+    "tap": "Tasbeeh",
+    "number": "Enter a number"
+  },
+  "Tasbeeh": {
+    "session": "This session",
+    "tapLabel": "Count one durood",
+    "hint": "Tap once after each durood",
+    "pending": "<n>{count}</n> waiting to be added",
+    "submit": "Jama karein",
+    "syncing": "Adding…",
+    "allSaved": "All added",
+    "offline": "You're offline. Your count is safe and will be added once you're back online.",
+    "retryLater": "Couldn't add it just now. Your count is safe; we'll try again shortly.",
+    "m33": "MashaAllah! 33 durood complete",
+    "m100": "SubhanAllah! 100 durood complete",
+    "m313": "Alhamdulillah! 313 durood complete",
+    "mThousand": "Allahu Akbar! {n} durood complete. May Allah accept it",
+    "sound": "Sound",
+    "focus": "Focus mode",
+    "exitFocus": "Close focus mode",
+    "reset": "New session",
+    "resetTitle": "Reset this session's count?",
+    "resetBody": "Only the count on screen goes back to zero. Durood already added, or still waiting to be added, stays safe.",
+    "resetConfirm": "Yes, reset",
+    "cancel": "Cancel"
+  },
   "Durood": {
     "short": "Short Durood",
     "ibrahimi": "Durood Ibrahimi",
