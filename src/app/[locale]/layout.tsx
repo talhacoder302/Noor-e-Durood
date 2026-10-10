@@ -3,11 +3,13 @@ import { Amiri, Inter, Noto_Nastaliq_Urdu } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { SiteHeader } from "@/components/shared/site-header";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { isRtl, routing } from "@/i18n/routing";
+import { siteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import "../globals.css";
 
@@ -45,10 +47,31 @@ export async function generateMetadata({
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "Meta" });
 
+  const isEn = locale === "en";
+
   return {
-    title: t("title"),
+    metadataBase: new URL(siteUrl()),
+    title: { default: t("title"), template: `%s · ${t("siteName")}` },
     description: t("description"),
     applicationName: "Noor-e-Durood",
+    keywords: t("keywords").split(",").map((k) => k.trim()),
+    alternates: {
+      canonical: isEn ? "/en" : "/",
+      languages: { "ur-PK": "/", en: "/en", "x-default": "/" },
+    },
+    openGraph: {
+      type: "website",
+      siteName: t("siteName"),
+      title: t("title"),
+      description: t("description"),
+      locale: isEn ? "en_US" : "ur_PK",
+      alternateLocale: isEn ? "ur_PK" : "en_US",
+      url: isEn ? "/en" : "/",
+    },
+    twitter: { card: "summary_large_image", title: t("title"), description: t("description") },
+    appleWebApp: { capable: true, title: "Noor-e-Durood", statusBarStyle: "default" },
+    icons: { apple: "/icons/apple-touch-icon.png" },
+    formatDetection: { telephone: false },
   };
 }
 
@@ -92,6 +115,7 @@ export default async function LocaleLayout({
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />
+            <RegisterServiceWorker />
             <Toaster
               position="top-center"
               dir={isRtl(locale) ? "rtl" : "ltr"}

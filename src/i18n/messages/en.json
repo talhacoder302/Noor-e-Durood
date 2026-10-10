@@ -1,5 +1,7 @@
 {
   "Meta": {
+    "siteName": "Noor-e-Durood",
+    "keywords": "Durood Shareef, Durood Ibrahimi, tasbeeh counter, salawat counter, Friday durood, Noor-e-Durood",
     "title": "Noor-e-Durood — Send Durood together",
     "description": "Recite Durood Shareef upon the Holy Prophet Muhammad ﷺ and add your count. Everyone's durood adds up to one shared total."
   },
@@ -9,7 +11,70 @@
     "home": "Home",
     "switchLanguage": "اردو",
     "switchLanguageLabel": "View in Urdu",
-    "toggleTheme": "Toggle light or dark mode"
+    "toggleTheme": "Toggle light or dark mode",
+    "myCount": "My count"
+  },
+  "Me": {
+    "metaTitle": "My count",
+    "title": "My count",
+    "private": "Only you can see this count, and only on this phone. It is never shown to anyone else.",
+    "today": "Today",
+    "week": "This week",
+    "month": "This month",
+    "allTime": "All time",
+    "last7": "Last 7 days",
+    "error": "Couldn't load your count right now.",
+    "retry": "Try again",
+    "shareTitle": "Share your count?",
+    "shareNote": "Your personal count is only shared if you choose to.",
+    "shareMine": "Yes, share with my count"
+  },
+  "Recovery": {
+    "title": "Your count on another phone",
+    "intro": "Optional: make a code and enter it on another phone, and both phones show the same count. No login.",
+    "create": "Make a recovery code",
+    "createNew": "Make a new recovery code",
+    "hasCode": "You already made a code. Making a new one stops the old one from working.",
+    "copy": "Copy code",
+    "copied": "Code copied",
+    "saveIt": "Save this code somewhere safe; it won't be shown again. Don't give it to anyone.",
+    "haveCode": "Have a code? Enter it here",
+    "restore": "Restore",
+    "restoreNote": "Anything counted on this phone so far is added to that count too.",
+    "restored": "Alhamdulillah! Your count is restored on this phone",
+    "errors": {
+      "invalid": "That doesn't look like a code. It has 8 characters, like ABCD-EFGH",
+      "not_found": "That code wasn't found. Please check and try again",
+      "rate_limited": "Too many tries. Please wait a little and try again",
+      "server": "Something went wrong. Please try again",
+      "network": "Looks like an internet problem. Please try again"
+    }
+  },
+  "Share": {
+    "title": "Noor-e-Durood",
+    "heading": "Invite others",
+    "sub": "The more people, the more durood",
+    "whatsapp": "Share on WhatsApp",
+    "more": "More",
+    "intro": "I sent Durood Shareef on Noor-e-Durood. Join in!",
+    "total": "{n} durood sent so far.",
+    "mineIntro": "Alhamdulillah, I've sent {n} durood on Noor-e-Durood. Join me!",
+    "mineTotal": "Together, {n} durood sent so far."
+  },
+  "Install": {
+    "title": "Install the Noor-e-Durood app",
+    "sub": "Open it from your home screen; tasbeeh works even without internet",
+    "button": "Install",
+    "iosHintBefore": "In Safari, tap",
+    "iosHintAfter": "then “Add to Home Screen”"
+  },
+  "Friday": {
+    "dismiss": "Dismiss"
+  },
+  "Offline": {
+    "title": "You're offline",
+    "body": "There's no internet, but you can keep counting your tasbeeh. The count is saved on this phone and added automatically once you're back online.",
+    "retry": "Try again"
   },
   "Hero": {
     "title": "Let us send Durood and Salaam upon the Holy Prophet ﷺ together",

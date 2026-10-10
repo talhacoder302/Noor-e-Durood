@@ -1,11 +1,14 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Suspense, use } from "react";
+import { AddDurood } from "@/components/counter/add-durood";
 import { InitialCounter } from "@/components/counter/initial-counter";
 import { LiveCounterSkeleton } from "@/components/counter/live-counter";
-import { AddDurood } from "@/components/counter/add-durood";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { DuroodCard } from "@/components/shared/durood-card";
+import { FridayBanner } from "@/components/shared/friday-banner";
 import { SalawatText } from "@/components/shared/salawat-text";
+import { ShareSection } from "@/components/shared/share-section";
 import type { Locale } from "@/i18n/routing";
 
 export default function HomePage({
@@ -20,6 +23,10 @@ export default function HomePage({
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-6 pb-12 sm:pt-10">
+      <Suspense fallback={null}>
+        <FridayBanner locale={locale} />
+      </Suspense>
+
       <section className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-xl leading-[1.9] font-semibold text-balance text-brand sm:text-3xl">
           <SalawatText>{t("title")}</SalawatText>
@@ -35,6 +42,8 @@ export default function HomePage({
 
       <AddDurood />
       <DuroodCard />
+      <ShareSection />
+      <InstallPrompt />
     </div>
   );
 }
