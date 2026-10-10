@@ -1,3 +1,4 @@
+import { ChartColumnIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitch } from "./language-switch";
@@ -25,7 +26,16 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="flex shrink-0 items-center gap-1">
+        <nav className="flex shrink-0 items-center gap-0.5">
+          <Link
+            href="/mera-hisaab"
+            aria-label={t("myCount")}
+            title={t("myCount")}
+            className="inline-flex h-10 items-center gap-1.5 rounded-full px-2.5 text-sm hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none sm:px-3"
+          >
+            <ChartColumnIcon className="size-5" />
+            <span className="hidden sm:inline">{t("myCount")}</span>
+          </Link>
           <LanguageSwitch />
           <ThemeToggle label={t("toggleTheme")} />
         </nav>

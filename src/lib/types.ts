@@ -20,3 +20,14 @@ export type SubmitErrorCode =
 export type SubmitResponse =
   | { ok: true; totals: Totals; duplicate: boolean; deviceId: string }
   | { ok: false; error: SubmitErrorCode; max?: number };
+
+/** One device's own numbers. Only ever returned to that device. */
+export type MySummary = {
+  today: number;
+  week: number;
+  month: number;
+  allTime: number;
+  /** Oldest first, always 7 entries ending today. */
+  last7: { day: string; count: number }[];
+  hasRecoveryCode: boolean;
+};

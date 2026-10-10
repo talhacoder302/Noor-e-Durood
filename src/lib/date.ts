@@ -27,3 +27,29 @@ export const counterIds = {
   day: (date: Date = new Date()) => `day:${karachiDay(date)}`,
   month: (date: Date = new Date()) => `month:${karachiMonth(date)}`,
 } as const;
+
+/** Day key `n` days after `day` (negative goes back). Pure calendar math. */
+export function addDays(day: string, n: number): string {
+  const d = new Date(`${day}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+/** 0 = Sunday … 6 = Saturday, for a day key. */
+export function weekdayOf(day: string): number {
+  return new Date(`${day}T00:00:00Z`).getUTCDay();
+}
+
+/** Monday of the Karachi week containing `day`. */
+export function weekStart(day: string): string {
+  return addDays(day, -((weekdayOf(day) + 6) % 7));
+}
+
+/** The last `n` Karachi days ending today, oldest first. */
+export function lastDays(n: number, today: string = karachiDay()): string[] {
+  return Array.from({ length: n }, (_, i) => addDays(today, i - (n - 1)));
+}
+
+export function isFridayInKarachi(date: Date = new Date()): boolean {
+  return weekdayOf(karachiDay(date)) === 5;
+}
