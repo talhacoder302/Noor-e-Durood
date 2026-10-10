@@ -45,14 +45,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
-  },
+  // The build type-checks only app code: tests need vitest, which a host
+  // may not install (devDependencies). `npx tsc --noEmit` still checks them.
+  typescript: { tsconfigPath: "tsconfig.build.json" },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
