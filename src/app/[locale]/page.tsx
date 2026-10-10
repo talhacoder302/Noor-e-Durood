@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Suspense, use } from "react";
 import { InitialCounter } from "@/components/counter/initial-counter";
 import { LiveCounterSkeleton } from "@/components/counter/live-counter";
-import { NumberEntry } from "@/components/counter/number-entry";
+import { AddDurood } from "@/components/counter/add-durood";
 import { DuroodCard } from "@/components/shared/durood-card";
 import { SalawatText } from "@/components/shared/salawat-text";
 import type { Locale } from "@/i18n/routing";
@@ -33,7 +33,7 @@ export default function HomePage({
         <InitialCounter />
       </Suspense>
 
-      <NumberEntry />
+      <AddDurood />
       <DuroodCard />
     </div>
   );
