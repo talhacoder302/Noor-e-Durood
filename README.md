@@ -1,6 +1,6 @@
 # Noor-e-Durood (نورِ درود)
 
-A simple web app where people send Durood Shareef upon the Holy Prophet Muhammad ﷺ and add their count. Everyone sees one live, shared total. No login, no names, no leaderboard: only the shared totals are public, on purpose, to keep it free of show-off (riya).
+A simple web app where people send Durood Shareef upon the Holy Prophet Muhammad ﷺ and add their count. Everyone sees one live, shared total. No login needed.
 
 Urdu by default (right-to-left), with English at `/en`. Built for phones and slow mobile internet, and it keeps counting offline.
 
@@ -18,8 +18,8 @@ Urdu by default (right-to-left), with English at `/en`. Built for phones and slo
 - **Number mode**: type how many you recited (Urdu digits work too) with quick +11 / +33 / +100 / +313 / +1000 buttons.
 - Taps are saved on the phone and sent in batches; nothing is lost offline or on a bad connection, and nothing is ever counted twice.
 - Durood Ibrahimi and the short durood in Arabic with Urdu (or English) translation.
-- **میرا حساب (My count)**: your own today / week / month / all-time count and a 7-day chart, private to your phone. An optional recovery code links a second phone. No login.
-- Share on WhatsApp or the phone's share sheet; a live preview image shows the total. Your own count is shared only if you choose.
+- **میرا حساب (My count)**: your own today / week / month / all-time count and a 7-day chart. An optional recovery code links a second phone. No login.
+- Share on WhatsApp or the phone's share sheet; a live preview image shows the total.
 - Friday reminder banner, announcements and a gentle "paused" notice from the admin.
 - Installable app (PWA) with an offline page where the tasbeeh still works.
 - Light and dark mode.
@@ -122,7 +122,7 @@ Admin actions are Server Actions, each checking the admin session first.
 ## Privacy and security
 
 - No accounts. Each phone gets an anonymous random id (localStorage + httpOnly cookie).
-- IPs are never stored, only a salted SHA-256 hash used for rate limits. Device ids and personal counts are never shown publicly.
+- IPs are never stored, only a salted SHA-256 hash used for rate limits. Device ids are never shown publicly.
 - Every input is validated with Zod. Totals only change with atomic `$inc`; each submission has a unique id, so retries can't double count.
 - Rate limits: 30 submissions per minute per device and 120 per IP; 5 admin logins per 15 minutes per IP; recovery-code guesses are limited too.
 - Admin: bcrypt-checked password, signed httpOnly `SameSite=Strict` session cookie (12 hours).

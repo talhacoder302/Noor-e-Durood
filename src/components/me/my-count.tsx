@@ -1,6 +1,6 @@
 "use client";
 
-import { LockIcon, RefreshCwIcon, Share2Icon } from "lucide-react";
+import { RefreshCwIcon, Share2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { applyPolled } from "@/components/counter/totals-store";
@@ -69,11 +69,6 @@ export function MyCount() {
 
   return (
     <div className="space-y-5">
-      <p className="flex items-start gap-2 rounded-xl border border-border bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
-        <LockIcon className="mt-1.5 size-4 shrink-0 text-brand" />
-        {t("private")}
-      </p>
-
       {state.status === "error" ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-6 text-center">
@@ -113,12 +108,9 @@ export function MyCount() {
             {sharing ? (
               <ShareButtons mine={s.allTime} />
             ) : (
-              <>
-                <p className="text-sm text-muted-foreground">{t("shareNote")}</p>
-                <Button type="button" variant="outline" onClick={() => setSharing(true)} className="h-11 w-full rounded-xl">
-                  {t("shareMine")}
-                </Button>
-              </>
+              <Button type="button" variant="outline" onClick={() => setSharing(true)} className="h-11 w-full rounded-xl">
+                {t("shareMine")}
+              </Button>
             )}
           </CardContent>
         </Card>

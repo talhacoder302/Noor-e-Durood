@@ -17,7 +17,6 @@
   "Me": {
     "metaTitle": "My count",
     "title": "My count",
-    "private": "Only you can see this count, and only on this phone. It is never shown to anyone else.",
     "today": "Today",
     "week": "This week",
     "month": "This month",
@@ -26,7 +25,6 @@
     "error": "Couldn't load your count right now.",
     "retry": "Try again",
     "shareTitle": "Share your count?",
-    "shareNote": "Your personal count is only shared if you choose to.",
     "shareMine": "Yes, share with my count"
   },
   "Recovery": {
@@ -219,7 +217,6 @@
   },
   "Footer": {
     "dua": "May Allah accept the durood of all of us. Ameen",
-    "privacy": "No names or personal counts are ever shown to anyone here.",
     "share": "Share"
   },
   "NotFound": {
