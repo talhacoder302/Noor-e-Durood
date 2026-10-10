@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countInWords, formatCount } from "./format";
+import { countInWords, formatCount, normalizeDigits } from "./format";
 
 describe("formatCount", () => {
   it("uses lakh/crore grouping in Urdu", () => {
@@ -56,5 +56,18 @@ describe("countInWords", () => {
   it("returns an empty label below one thousand", () => {
     expect(countInWords(0, "ur")).toBe("");
     expect(countInWords(999, "en")).toBe("");
+  });
+});
+
+describe("normalizeDigits", () => {
+  it("accepts Urdu and Arabic digits", () => {
+    expect(normalizeDigits("۵۰۰")).toBe("500");
+    expect(normalizeDigits("٣١٣")).toBe("313");
+  });
+
+  it("drops anything that is not a digit", () => {
+    expect(normalizeDigits("1,000")).toBe("1000");
+    expect(normalizeDigits(" 12a3 ")).toBe("123");
+    expect(normalizeDigits("-5.5")).toBe("55");
   });
 });

@@ -12,22 +12,41 @@
     "toggleTheme": "Toggle light or dark mode"
   },
   "Hero": {
-    "eyebrow": "Durood Shareef",
     "title": "Let us send Durood and Salaam upon the Holy Prophet ﷺ together",
-    "subtitle": "However much durood you recite, add it here. Together, every count becomes one light.",
-    "shortDuroodLabel": "Short Durood",
-    "shortDuroodTranslation": "May Allah send blessings and peace upon him ﷺ and his family."
+    "subtitle": "However much durood you recite, add it here. Together, every count becomes one light."
   },
   "Counter": {
-    "total": "Total durood sent so far",
+    "total": "Durood sent so far",
     "today": "Today",
     "month": "This month",
-    "comingSoon": "The live count will appear here soon"
+    "live": "Live",
+    "unavailable": "Couldn't load the count right now. Trying again shortly."
   },
-  "Actions": {
-    "tasbeeh": "Tasbeeh",
-    "number": "Enter a number",
-    "submit": "Jama karein"
+  "Entry": {
+    "title": "How much durood did you recite?",
+    "label": "Number of durood",
+    "placeholder": "e.g. 500",
+    "quickLabel": "Quickly add to the count",
+    "quickAdd": "Add {n}",
+    "submit": "Jama karein",
+    "submitting": "Adding…",
+    "success": "JazakAllah! Your durood has been added.",
+    "errors": {
+      "invalid": "Please enter a valid number",
+      "entry_limit": "You can add at most {max} durood at a time",
+      "daily_limit": "Today's limit ({max}) for this device has been reached. Please add more tomorrow, InshaAllah.",
+      "rate_limited": "Too many submissions too quickly. Please wait a moment and try again.",
+      "paused": "Adding durood is paused for a little while",
+      "network": "Looks like an internet problem. Please try again.",
+      "server": "Something went wrong. Please try again."
+    }
+  },
+  "Durood": {
+    "short": "Short Durood",
+    "ibrahimi": "Durood Ibrahimi",
+    "shortTranslation": "May Allah send blessings and peace upon him ﷺ and his family.",
+    "ibrahimiTranslation1": "O Allah, send blessings upon Muhammad ﷺ and upon the family of Muhammad ﷺ, as You sent blessings upon Ibrahim (peace be upon him) and upon the family of Ibrahim. Indeed, You are Praiseworthy, Glorious.",
+    "ibrahimiTranslation2": "O Allah, send barakah upon Muhammad ﷺ and upon the family of Muhammad ﷺ, as You sent barakah upon Ibrahim (peace be upon him) and upon the family of Ibrahim. Indeed, You are Praiseworthy, Glorious."
   },
   "Footer": {
     "dua": "May Allah accept the durood of all of us. Ameen",

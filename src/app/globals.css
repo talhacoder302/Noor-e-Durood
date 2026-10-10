@@ -164,3 +164,12 @@
     line-height: 0;
   }
 }
+
+/* Sonner sets its own system font; toasts should use the page's (Nastaliq in
+   Urdu). Extra specificity beats its runtime-injected styles. */
+body [data-sonner-toaster] {
+  font-family: inherit;
+}
+body [data-sonner-toast] [data-title] {
+  line-height: 1.9;
+}

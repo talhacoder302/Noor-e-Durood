@@ -71,3 +71,14 @@ export function countInWords(value: number, locale: NumberLocale): string {
   }
   return parts.join(" ");
 }
+
+/**
+ * Converts Urdu (۰–۹) and Arabic (٠–٩) digits to 0–9 and drops everything
+ * else, so "۵۰۰" typed on an Urdu keyboard becomes "500".
+ */
+export function normalizeDigits(input: string): string {
+  return input
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/\D/g, "");
+}
