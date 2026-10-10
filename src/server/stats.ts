@@ -13,3 +13,10 @@ export async function getCachedTotals(): Promise<Totals> {
   cacheLife({ stale: 3, revalidate: 3, expire: 60 });
   return getTotals();
 }
+
+/** Total for social preview images; a few minutes old is fine there. */
+export async function getCachedTotalsForPreview(): Promise<Totals> {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 300, expire: 3600 });
+  return getTotals();
+}
