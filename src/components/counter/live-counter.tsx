@@ -89,6 +89,13 @@ function totalSizeClass(digits: number) {
   return "text-3xl sm:text-5xl";
 }
 
+/** Same idea for the smaller today / month cards (half the screen width). */
+function smallSizeClass(digits: number) {
+  if (digits <= 8) return "text-2xl";
+  if (digits <= 10) return "text-xl";
+  return "text-lg";
+}
+
 export function LiveCounter({ initial }: { initial: Totals | null }) {
   const totals = useTotals(initial);
 
@@ -171,7 +178,10 @@ function CounterView({
                 <AnimatedNumber
                   value={totals[key]}
                   locale={locale}
-                  className="text-2xl font-semibold text-brand"
+                  className={cn(
+                    "font-semibold text-brand",
+                    smallSizeClass(String(totals[key]).length),
+                  )}
                 />
               ) : (
                 <Skeleton className="h-8 w-24 rounded-md" />
