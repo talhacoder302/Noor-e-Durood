@@ -15,6 +15,7 @@ const STATUS = {
   daily_limit: 429,
   rate_limited: 429,
   paused: 503,
+  blocked: 403,
   server: 500,
 } as const;
 

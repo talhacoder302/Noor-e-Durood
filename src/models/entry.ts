@@ -15,6 +15,7 @@ export type EntryDoc = {
   userAgentShort: string;
   removed: boolean;
   removedReason?: string;
+  removedAt?: Date;
 };
 
 const entrySchema = new Schema<EntryDoc>(
@@ -29,6 +30,7 @@ const entrySchema = new Schema<EntryDoc>(
     userAgentShort: { type: String, default: "" },
     removed: { type: Boolean, default: false },
     removedReason: { type: String },
+    removedAt: { type: Date },
   },
   { collection: "entries", versionKey: false },
 );
@@ -36,6 +38,8 @@ const entrySchema = new Schema<EntryDoc>(
 entrySchema.index({ clientId: 1 }, { unique: true });
 entrySchema.index({ deviceId: 1, createdAt: -1 });
 entrySchema.index({ createdAt: -1 });
+// Admin: today's entries by hour, biggest entries of a day, totals per day.
+entrySchema.index({ day: 1, count: -1 });
 
 export const Entry: Model<EntryDoc> =
   (models.Entry as Model<EntryDoc>) ?? model("Entry", entrySchema);

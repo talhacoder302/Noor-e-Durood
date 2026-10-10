@@ -63,26 +63,27 @@ async function reserveDeviceQuota(
   limit: number,
   day: string,
   now: Date,
-): Promise<boolean> {
-  if (count > limit) return false;
+): Promise<"ok" | "full" | "blocked"> {
+  // Bigger than a whole day's allowance: refuse before touching anything.
+  if (count > limit) return "full";
 
   for (let attempt = 0; attempt < 2; attempt++) {
     // Same day, enough room left.
     const sameDay = await DeviceStat.updateOne(
-      { deviceId, day, dayCount: { $lte: limit - count } },
+      { deviceId, day, dayCount: { $lte: limit - count }, blocked: { $ne: true } },
       { $inc: { dayCount: count, totalCount: count }, $set: { lastEntryAt: now } },
     );
-    if (sameDay.matchedCount === 1) return true;
+    if (sameDay.matchedCount === 1) return "ok";
 
     // First entry of a new day: start the day's count fresh.
     const newDay = await DeviceStat.updateOne(
-      { deviceId, day: { $ne: day } },
+      { deviceId, day: { $ne: day }, blocked: { $ne: true } },
       {
         $set: { day, dayCount: count, lastEntryAt: now },
         $inc: { totalCount: count },
       },
     );
-    if (newDay.matchedCount === 1) return true;
+    if (newDay.matchedCount === 1) return "ok";
 
     // Brand new device. If another request created it first, loop once more.
     try {
@@ -93,14 +94,16 @@ async function reserveDeviceQuota(
         totalCount: count,
         lastEntryAt: now,
       });
-      return true;
+      return "ok";
     } catch (error) {
       if (!isDuplicateKey(error)) throw error;
     }
   }
 
-  // The document exists for today and has no room left.
-  return false;
+  // Either blocked by an admin or no room left today. Only this (rare) path
+  // pays for the extra read.
+  const stat = await DeviceStat.findOne({ deviceId }, { blocked: 1 }).lean();
+  return stat?.blocked ? "blocked" : "full";
 }
 
 async function incrementCounters(count: number, now: Date): Promise<Totals> {
@@ -180,9 +183,11 @@ export async function addDurood(input: AddDuroodInput): Promise<AddDuroodResult>
     throw error;
   });
 
-  if (!reserved) {
+  if (reserved !== "ok") {
     await Entry.deleteOne({ clientId: input.clientId });
-    return { ok: false, error: "daily_limit", max: settings.maxPerDevicePerDay };
+    return reserved === "blocked"
+      ? { ok: false, error: "blocked" }
+      : { ok: false, error: "daily_limit", max: settings.maxPerDevicePerDay };
   }
 
   const totals = await incrementCounters(input.count, now);

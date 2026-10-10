@@ -15,6 +15,7 @@ export type SubmitErrorCode =
   | "daily_limit"
   | "rate_limited"
   | "paused"
+  | "blocked"
   | "server";
 
 export type SubmitResponse =
