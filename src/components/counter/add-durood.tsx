@@ -8,7 +8,10 @@ import { TasbeehPanel } from "@/components/tasbeeh/tasbeeh-panel";
 import { startTasbeehSync } from "@/components/tasbeeh/tasbeeh-store";
 import { isRtl, type Locale } from "@/i18n/routing";
 import { useLocalPref } from "@/lib/use-local-pref";
-import { NumberEntry } from "./number-entry";
+import dynamic from "next/dynamic";
+
+// The number form is only downloaded once its tab is opened.
+const NumberEntry = dynamic(() => import("./number-entry").then((m) => m.NumberEntry));
 
 type Mode = "tap" | "number";
 

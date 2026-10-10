@@ -2,12 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Amiri, Inter, Noto_Nastaliq_Urdu } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { SiteHeader } from "@/components/shared/site-header";
 import { ThemeProvider } from "@/components/shared/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { LazyToaster as Toaster } from "@/components/shared/lazy-toaster";
+import { pickMessages, PUBLIC_CLIENT_NAMESPACES } from "@/i18n/client-messages";
 import { isRtl, routing } from "@/i18n/routing";
 import { siteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -21,11 +22,14 @@ const inter = Inter({
 
 // Arabic subsets only: these fonts are for Arabic and Urdu script, and the
 // unicode-range keeps them from downloading on English-only text.
+// Amiri (durood text, ﷺ) is one weight and not preloaded: it's below the
+// fold, and keeping it off the critical path is worth ~200 KB on slow 4G.
 const amiri = Amiri({
   subsets: ["arabic"],
-  weight: ["400", "700"],
+  weight: "400",
   variable: "--font-amiri",
   display: "swap",
+  preload: false,
 });
 
 const nastaliq = Noto_Nastaliq_Urdu({
@@ -91,6 +95,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const clientMessages = pickMessages(await getMessages(), PUBLIC_CLIENT_NAMESPACES);
 
   return (
     <html
@@ -105,7 +110,7 @@ export default async function LocaleLayout({
           locale === "ur" ? "font-urdu" : "font-sans",
         )}
       >
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

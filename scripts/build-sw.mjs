@@ -10,9 +10,9 @@ const buildId = fs.readFileSync(".next/BUILD_ID", "utf8").trim();
 
 const { manifestEntries, count, size, warnings } = await getManifest({
   globDirectory: ".next",
-  // Fonts: only the subsets the pages preload (".p."); others are cached
-  // at runtime if a page ever needs them.
-  globPatterns: ["static/**/*.{js,css}", "static/media/*.p.*.woff2"],
+  // All font files too: Amiri isn't preloaded, but the offline page needs it.
+  // This happens in the background after the first visit.
+  globPatterns: ["static/**/*.{js,css,woff2}"],
   modifyURLPrefix: { "static/": "/_next/static/" },
   // File names under /_next/static are already content-hashed.
   dontCacheBustURLsMatching: /^\/_next\/static\//,

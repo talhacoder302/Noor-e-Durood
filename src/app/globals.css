@@ -177,3 +177,9 @@ body [data-sonner-toaster] {
 body [data-sonner-toast] [data-title] {
   line-height: 1.9;
 }
+
+/* Amiri ships one weight; keep Arabic text regular rather than faux bold. */
+.arabic-text,
+.salawat {
+  font-synthesis: none;
+}
