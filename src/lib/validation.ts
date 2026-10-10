@@ -11,3 +11,8 @@ export const duroodSubmissionSchema = z.object({
 export type DuroodSubmission = z.infer<typeof duroodSubmissionSchema>;
 
 export const deviceSyncSchema = z.object({ deviceId: z.uuid() });
+
+export const recoveryRestoreSchema = z.object({
+  deviceId: z.uuid(),
+  code: z.string().min(4).max(32),
+});
