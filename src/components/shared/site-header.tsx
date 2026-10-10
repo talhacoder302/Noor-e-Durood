@@ -17,7 +17,7 @@ export function SiteHeader() {
         >
           <LogoMark />
           <span className="flex min-w-0 flex-col leading-tight">
-            <span lang="ur" className="font-urdu text-lg leading-[1.9] text-brand">
+            <span lang="ur" className="font-urdu text-lg leading-loose text-brand">
               نورِ درود
             </span>
             <span lang="en" className="font-sans text-[11px] font-medium tracking-wide text-muted-foreground">

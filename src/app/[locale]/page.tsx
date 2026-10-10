@@ -28,7 +28,7 @@ export default function HomePage({
       </Suspense>
 
       <section className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-xl leading-[1.9] font-semibold text-balance text-brand sm:text-3xl">
+        <h1 className="text-xl leading-loose font-semibold text-balance text-brand sm:text-3xl">
           <SalawatText>{t("title")}</SalawatText>
         </h1>
         <p className="max-w-xl text-sm text-pretty text-muted-foreground sm:text-base">

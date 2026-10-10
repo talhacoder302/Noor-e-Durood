@@ -25,7 +25,7 @@ export default function MeraHisaabPage({ params }: Params) {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-5 px-4 pt-6 pb-12 sm:pt-10">
-      <h1 className="text-center text-2xl leading-[1.9] font-semibold text-brand">{t("title")}</h1>
+      <h1 className="text-center text-2xl leading-loose font-semibold text-brand">{t("title")}</h1>
       <MyCount />
     </div>
   );

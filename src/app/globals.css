@@ -110,8 +110,33 @@
   /* Nastaliq has tall ascenders and deep descenders; give it room so it is
      never clipped. */
   html[lang="ur"] body {
-    line-height: 2;
+    line-height: 2.3;
   }
+}
+
+/* Urdu (Nastaliq) needs much taller lines than Latin text, or one line's
+   descenders touch the next line's ascenders. Tailwind's text-* and leading-*
+   classes read these variables, so overriding them on Urdu pages fixes every
+   size at once. English pages are unaffected; Arabic text (.arabic-text) and
+   numbers (.num) keep their own spacing below. Unlayered on purpose so it
+   wins over Tailwind's theme layer. */
+html[lang="ur"] {
+  --text-xs--line-height: 2.3;
+  --text-sm--line-height: 2.3;
+  --text-base--line-height: 2.3;
+  --text-lg--line-height: 2.25;
+  --text-xl--line-height: 2.2;
+  --text-2xl--line-height: 2.15;
+  --text-3xl--line-height: 2.1;
+  --leading-normal: 2.2;
+  --leading-relaxed: 2.3;
+  --leading-loose: 2.4;
+}
+
+/* Numbers in Urdu pages are Latin digits (Inter) and don't need Nastaliq
+   spacing; without this the stat cards would grow tall for no reason. */
+html[lang="ur"] .num:not(:where(p, span) .num) {
+  line-height: 1.35;
 }
 
 @layer components {
@@ -176,6 +201,9 @@ body [data-sonner-toaster] {
 }
 body [data-sonner-toast] [data-title] {
   line-height: 1.9;
+}
+html[lang="ur"] body [data-sonner-toast] [data-title] {
+  line-height: 2.3;
 }
 
 /* Amiri ships one weight; keep Arabic text regular rather than faux bold. */

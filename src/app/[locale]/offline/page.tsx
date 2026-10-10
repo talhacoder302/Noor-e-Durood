@@ -28,7 +28,7 @@ export default function OfflinePage({ params }: Params) {
     <div className="mx-auto flex max-w-3xl flex-col gap-5 px-4 pt-6 pb-12">
       <section className="flex flex-col items-center gap-2 text-center">
         <CloudOffIcon className="size-8 text-gold" aria-hidden />
-        <h1 className="text-xl leading-[1.9] font-semibold text-brand">{t("title")}</h1>
+        <h1 className="text-xl leading-loose font-semibold text-brand">{t("title")}</h1>
         <p className="max-w-md text-sm text-muted-foreground">{t("body")}</p>
         <Link href="/" className="text-sm text-brand underline underline-offset-4">
           {t("retry")}
