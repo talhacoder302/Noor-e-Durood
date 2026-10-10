@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { getSessionState, setSessionUser } from "@/components/auth/session-store";
 import { getDeviceId, peekDeviceId, rememberDeviceId } from "@/lib/device-id";
 import { beaconDurood, submitDurood } from "@/lib/submit-durood";
 import {
@@ -122,6 +123,8 @@ async function runFlush(keepalive: boolean) {
   );
 
   if (outcome.status === "failed") {
+    // The session ended: wait quietly for the user to log in again.
+    if (outcome.error === "login_required") setSessionUser(null);
     failures++;
     nextAutoAt = Date.now() + Math.min(MAX_BACKOFF_MS, AUTO_FLUSH_MS * 2 ** (failures - 1));
     update({ syncing: false, error: outcome.error, errorMax: outcome.max });
@@ -140,6 +143,8 @@ export function flush({ manual = false, keepalive = false } = {}): Promise<void>
   if (flushing) return flushing;
   const s = getQueue().read();
   if (s.pending === 0 && !s.inflight) return Promise.resolve();
+  // Guests can count, but only an account can add: keep taps on the phone.
+  if (getSessionState().status === "guest") return Promise.resolve();
   if (!manual && (Date.now() < nextAutoAt || !navigator.onLine)) {
     return Promise.resolve();
   }
@@ -162,6 +167,7 @@ export function flush({ manual = false, keepalive = false } = {}): Promise<void>
 
 /** Page is going away: hand the batch to the browser to deliver. */
 function beacon() {
+  if (getSessionState().status === "guest") return;
   const deviceId = peekDeviceId();
   if (!deviceId) return;
   const batch = getQueue().takeBatch();

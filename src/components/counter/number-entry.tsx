@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { LoginPrompt } from "@/components/auth/login-prompt";
+import { setSessionUser, useSession } from "@/components/auth/session-store";
 import { getDeviceId, rememberDeviceId } from "@/lib/device-id";
 import { formatCount, normalizeDigits, type NumberLocale } from "@/lib/format";
 import { submitDurood } from "@/lib/submit-durood";
@@ -25,6 +27,8 @@ export function NumberEntry() {
   const locale = useLocale() as NumberLocale;
   const [value, setValue] = useState("");
   const [pending, setPending] = useState(false);
+  const session = useSession();
+  const tAuth = useTranslations("Auth");
 
   // Create the anonymous device id (and its cookie) on first visit.
   useEffect(() => {
@@ -66,6 +70,8 @@ export function NumberEntry() {
         toast.success(t("success"));
       } else {
         rollbackOptimistic(count);
+        // Logged out elsewhere (or the session expired): show the login prompt.
+        if (result.error === "login_required") setSessionUser(null);
         toast.error(
           t(`errors.${result.error}`, {
             max: result.max ? formatCount(result.max, locale) : "",
@@ -85,49 +91,53 @@ export function NumberEntry() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <label htmlFor="durood-count" className="sr-only">
-            {t("label")}
-          </label>
-          <Input
-            id="durood-count"
-            name="count"
-            type="text"
-            inputMode="numeric"
-            autoComplete="off"
-            dir="ltr"
-            placeholder={t("placeholder")}
-            value={value}
-            onChange={(e) => setDigits(e.target.value)}
-            disabled={pending}
-            className="num h-14 rounded-xl text-center text-2xl font-semibold md:text-2xl"
-          />
+        {session.status === "guest" ? (
+          <LoginPrompt message={tAuth("loginToAdd")} />
+        ) : (
+          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+            <label htmlFor="durood-count" className="sr-only">
+              {t("label")}
+            </label>
+            <Input
+              id="durood-count"
+              name="count"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              dir="ltr"
+              placeholder={t("placeholder")}
+              value={value}
+              onChange={(e) => setDigits(e.target.value)}
+              disabled={pending}
+              className="num h-14 rounded-xl text-center text-2xl font-semibold md:text-2xl"
+            />
 
-          <div className="grid grid-cols-5 gap-2" role="group" aria-label={t("quickLabel")}>
-            {QUICK_ADDS.map((n) => (
-              <Button
-                key={n}
-                type="button"
-                variant="outline"
-                onClick={() => quickAdd(n)}
-                disabled={pending}
-                aria-label={t("quickAdd", { n })}
-                className="num h-11 rounded-xl px-0 text-sm font-medium"
-              >
-                +{n}
-              </Button>
-            ))}
-          </div>
+            <div className="grid grid-cols-5 gap-2" role="group" aria-label={t("quickLabel")}>
+              {QUICK_ADDS.map((n) => (
+                <Button
+                  key={n}
+                  type="button"
+                  variant="outline"
+                  onClick={() => quickAdd(n)}
+                  disabled={pending}
+                  aria-label={t("quickAdd", { n })}
+                  className="num h-11 rounded-xl px-0 text-sm font-medium"
+                >
+                  +{n}
+                </Button>
+              ))}
+            </div>
 
-          <Button
-            type="submit"
-            disabled={pending || !value}
-            className="h-13 rounded-xl text-lg"
-          >
-            {pending && <Loader2Icon className="size-5 animate-spin" />}
-            {pending ? t("submitting") : t("submit")}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              disabled={pending || !value}
+              className="h-13 rounded-xl text-lg"
+            >
+              {pending && <Loader2Icon className="size-5 animate-spin" />}
+              {pending ? t("submitting") : t("submit")}
+            </Button>
+          </form>
+        )}
       </CardContent>
     </Card>
   );

@@ -16,13 +16,14 @@ export type SubmitErrorCode =
   | "rate_limited"
   | "paused"
   | "blocked"
+  | "login_required"
   | "server";
 
 export type SubmitResponse =
   | { ok: true; totals: Totals; duplicate: boolean; deviceId: string }
   | { ok: false; error: SubmitErrorCode; max?: number };
 
-/** One device's own numbers. Only ever returned to that device. */
+/** One account's own numbers (all its phones together). Only returned to that account. */
 export type MySummary = {
   today: number;
   week: number;
@@ -30,5 +31,16 @@ export type MySummary = {
   allTime: number;
   /** Oldest first, always 7 entries ending today. */
   last7: { day: string; count: number }[];
-  hasRecoveryCode: boolean;
+};
+
+/** What the browser may know about the logged-in user (never the full phone or PIN). */
+export type PublicUser = {
+  id: string;
+  phoneMasked: string;
+  name: string;
+  majlisId: string | null;
+  majlisName: string | null;
+  majlisOther: string;
+  age: number | null;
+  city: string;
 };

@@ -4,7 +4,9 @@ import type { ClientSubmitResult } from "./submit-durood";
 
 // Errors where the server may have stored the batch, or will accept it
 // unchanged later: keep the batch and its clientId for the next attempt.
-const KEEP_BATCH = new Set(["network", "server", "rate_limited", "paused"]);
+// login_required: not stored either, but it will be accepted unchanged once
+// the user logs in, so it waits with the same clientId.
+const KEEP_BATCH = new Set(["network", "server", "rate_limited", "paused", "login_required"]);
 
 export type FlushOutcome =
   | { status: "idle" }

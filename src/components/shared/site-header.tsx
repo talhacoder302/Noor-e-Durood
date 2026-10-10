@@ -1,5 +1,5 @@
-import { ChartColumnIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { UserButton } from "@/components/auth/user-button";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitch } from "./language-switch";
 import { ThemeToggle } from "./theme-toggle";
@@ -20,22 +20,18 @@ export function SiteHeader() {
             <span lang="ur" className="font-urdu text-lg leading-loose text-brand">
               نورِ درود
             </span>
-            <span lang="en" className="font-sans text-[11px] font-medium tracking-wide text-muted-foreground">
+            {/* Hidden on narrow phones, where the header also holds the login button. */}
+            <span
+              lang="en"
+              className="hidden font-sans text-[11px] font-medium tracking-wide whitespace-nowrap text-muted-foreground min-[400px]:block"
+            >
               Noor-e-Durood
             </span>
           </span>
         </Link>
 
         <nav className="flex shrink-0 items-center gap-0.5">
-          <Link
-            href="/mera-hisaab"
-            aria-label={t("myCount")}
-            title={t("myCount")}
-            className="inline-flex h-10 items-center gap-1.5 rounded-full px-2.5 text-sm hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none sm:px-3"
-          >
-            <ChartColumnIcon className="size-5" />
-            <span className="hidden sm:inline">{t("myCount")}</span>
-          </Link>
+          <UserButton />
           <LanguageSwitch />
           <ThemeToggle label={t("toggleTheme")} />
         </nav>

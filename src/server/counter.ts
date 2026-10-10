@@ -3,13 +3,17 @@ import { counterIds, karachiDay } from "@/lib/date";
 import { RATE_LIMIT_PER_DEVICE, RATE_LIMIT_PER_IP } from "@/lib/limits";
 import type { DuroodMode, SubmitErrorCode, Totals } from "@/lib/types";
 import { Counter, type CounterDoc } from "@/models/counter";
-import { DeviceStat } from "@/models/device-stat";
 import { Entry } from "@/models/entry";
+import { User } from "@/models/user";
 import { hitRateLimit } from "./rate-limit";
 import { ready } from "./ready";
 import { getSettings } from "./settings";
 
 export type AddDuroodInput = {
+  /** The logged-in account; submitting needs one. */
+  userId: string;
+  /** The account's majlis right now, stored on the entry. */
+  majlisId?: string;
   deviceId: string;
   clientId: string;
   count: number;
@@ -54,11 +58,12 @@ export async function getTotals(now: Date = new Date()): Promise<Totals> {
 }
 
 /**
- * Reserves `count` from the device's daily allowance in one atomic step, so
- * parallel requests can never push a device past the limit.
+ * Reserves `count` from the user's daily allowance in one atomic step, so
+ * parallel requests can never push an account past the limit. Disabled
+ * accounts never match.
  */
-async function reserveDeviceQuota(
-  deviceId: string,
+async function reserveUserQuota(
+  userId: string,
   count: number,
   limit: number,
   day: string,
@@ -67,43 +72,27 @@ async function reserveDeviceQuota(
   // Bigger than a whole day's allowance: refuse before touching anything.
   if (count > limit) return "full";
 
+  // Twice: if a parallel request starts the new day between our two updates,
+  // the second round finds it with the same-day update.
   for (let attempt = 0; attempt < 2; attempt++) {
     // Same day, enough room left.
-    const sameDay = await DeviceStat.updateOne(
-      { deviceId, day, dayCount: { $lte: limit - count }, blocked: { $ne: true } },
+    const sameDay = await User.updateOne(
+      { _id: userId, day, dayCount: { $lte: limit - count }, disabled: { $ne: true } },
       { $inc: { dayCount: count, totalCount: count }, $set: { lastEntryAt: now } },
     );
     if (sameDay.matchedCount === 1) return "ok";
 
     // First entry of a new day: start the day's count fresh.
-    const newDay = await DeviceStat.updateOne(
-      { deviceId, day: { $ne: day }, blocked: { $ne: true } },
-      {
-        $set: { day, dayCount: count, lastEntryAt: now },
-        $inc: { totalCount: count },
-      },
+    const newDay = await User.updateOne(
+      { _id: userId, day: { $ne: day }, disabled: { $ne: true } },
+      { $set: { day, dayCount: count, lastEntryAt: now }, $inc: { totalCount: count } },
     );
     if (newDay.matchedCount === 1) return "ok";
-
-    // Brand new device. If another request created it first, loop once more.
-    try {
-      await DeviceStat.create({
-        deviceId,
-        day,
-        dayCount: count,
-        totalCount: count,
-        lastEntryAt: now,
-      });
-      return "ok";
-    } catch (error) {
-      if (!isDuplicateKey(error)) throw error;
-    }
   }
 
-  // Either blocked by an admin or no room left today. Only this (rare) path
-  // pays for the extra read.
-  const stat = await DeviceStat.findOne({ deviceId }, { blocked: 1 }).lean();
-  return stat?.blocked ? "blocked" : "full";
+  // Either disabled by an admin or no room left today.
+  const user = await User.findById(userId, { disabled: 1 }).lean();
+  return !user || user.disabled ? "blocked" : "full";
 }
 
 async function incrementCounters(count: number, now: Date): Promise<Totals> {
@@ -130,9 +119,9 @@ async function incrementCounters(count: number, now: Date): Promise<Totals> {
 
 /**
  * Adds a submission. Order matters:
- * 1. rate limits (per device and per IP hash)
+ * 1. rate limits (per account and per IP hash)
  * 2. insert the Entry; its unique clientId makes retries a no-op
- * 3. reserve the device's daily allowance (undo the Entry if it is full)
+ * 3. reserve the account's daily allowance (undo the Entry if it is full)
  * 4. $inc the global, day and month counters
  */
 export async function addDurood(input: AddDuroodInput): Promise<AddDuroodResult> {
@@ -147,16 +136,18 @@ export async function addDurood(input: AddDuroodInput): Promise<AddDuroodResult>
     return { ok: false, error: "entry_limit", max: settings.maxPerEntry };
   }
 
-  const [deviceOk, ipOk] = await Promise.all([
-    hitRateLimit(`dev:${input.deviceId}`, RATE_LIMIT_PER_DEVICE, now),
+  const [userOk, ipOk] = await Promise.all([
+    hitRateLimit(`user:${input.userId}`, RATE_LIMIT_PER_DEVICE, now),
     hitRateLimit(`ip:${input.ipHash}`, RATE_LIMIT_PER_IP, now),
   ]);
-  if (!deviceOk || !ipOk) return { ok: false, error: "rate_limited" };
+  if (!userOk || !ipOk) return { ok: false, error: "rate_limited" };
 
   try {
     await Entry.create({
       clientId: input.clientId,
       deviceId: input.deviceId,
+      userId: input.userId,
+      ...(input.majlisId ? { majlisId: input.majlisId } : {}),
       count: input.count,
       mode: input.mode,
       day,
@@ -172,8 +163,8 @@ export async function addDurood(input: AddDuroodInput): Promise<AddDuroodResult>
     throw error;
   }
 
-  const reserved = await reserveDeviceQuota(
-    input.deviceId,
+  const reserved = await reserveUserQuota(
+    input.userId,
     input.count,
     settings.maxPerDevicePerDay,
     day,

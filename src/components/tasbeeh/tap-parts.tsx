@@ -4,6 +4,8 @@ import { animate } from "framer-motion/dom";
 import { CheckIcon, CloudOffIcon, Loader2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { LoginPrompt } from "@/components/auth/login-prompt";
+import { useSession } from "@/components/auth/session-store";
 import { Button } from "@/components/ui/button";
 import { formatCount, type NumberLocale } from "@/lib/format";
 import { unsentCount } from "@/lib/tap-queue";
@@ -105,7 +107,23 @@ export function SyncRow() {
   const tErr = useTranslations("Entry.errors");
   const locale = useLocale() as NumberLocale;
   const { queue, syncing, online, error, errorMax } = useTasbeeh();
+  const session = useSession();
   const unsent = unsentCount(queue);
+
+  // Guests can keep counting; the taps wait on this phone until they log in.
+  if (session.status === "guest" && unsent > 0) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-sm text-muted-foreground">
+          {t.rich("pending", {
+            count: formatCount(unsent, locale),
+            n: (chunks) => <span className="num font-semibold text-foreground">{chunks}</span>,
+          })}
+        </p>
+        <LoginPrompt message={t("loginToSave")} compact />
+      </div>
+    );
+  }
 
   let note: string | null = null;
   if (!online) note = t("offline");

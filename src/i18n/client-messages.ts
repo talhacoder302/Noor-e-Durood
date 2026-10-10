@@ -14,7 +14,8 @@ export const PUBLIC_CLIENT_NAMESPACES = [
   "Install",
   "Friday",
   "Me",
-  "Recovery",
+  "Auth",
+  "Profile",
 ] as const;
 
 export function pickMessages(

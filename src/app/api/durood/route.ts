@@ -1,13 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { SubmitResponse } from "@/lib/types";
 import { duroodSubmissionSchema } from "@/lib/validation";
+import { getSessionUser } from "@/server/accounts";
 import { addDurood } from "@/server/counter";
 import {
   DEVICE_COOKIE,
   resolveDeviceId,
   setDeviceCookie,
 } from "@/server/device-cookie";
+import { isJsonRequest } from "@/server/http";
 import { getClientIp, hashIp, shortUserAgent } from "@/server/request-meta";
+import { SESSION_COOKIE } from "@/server/session";
 
 const STATUS = {
   invalid: 400,
@@ -16,6 +19,7 @@ const STATUS = {
   rate_limited: 429,
   paused: 503,
   blocked: 403,
+  login_required: 401,
   server: 500,
 } as const;
 
@@ -27,6 +31,7 @@ function reply(body: SubmitResponse, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isJsonRequest(request)) return reply({ ok: false, error: "invalid" }, STATUS.invalid);
   let raw: unknown;
   try {
     raw = await request.json();
@@ -43,7 +48,13 @@ export async function POST(request: NextRequest) {
   const deviceId = resolveDeviceId(cookieId, parsed.data.deviceId);
 
   try {
+    // Adding durood needs an account; guests can only watch the counts.
+    const user = await getSessionUser(request.cookies.get(SESSION_COOKIE)?.value);
+    if (!user) return reply({ ok: false, error: "login_required" }, STATUS.login_required);
+
     const result = await addDurood({
+      userId: user._id.toString(),
+      majlisId: user.majlisId,
       deviceId,
       clientId: parsed.data.clientId,
       count: parsed.data.count,
