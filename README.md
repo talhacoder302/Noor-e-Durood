@@ -131,7 +131,7 @@ Admin actions are Server Actions, each checking the admin session first.
 - Accounts are a mobile number + 4-digit PIN (bcrypt-hashed). Wrong PINs lock the account for 15 minutes after 5 tries, 1 hour after 10, 24 hours after 15. Sessions are random tokens in an httpOnly cookie; only their hash is stored. No OTP yet, so the admin resets forgotten PINs.
 - IPs are never stored, only a salted SHA-256 hash used for rate limits. Device ids are never shown publicly.
 - Every input is validated with Zod. Totals only change with atomic `$inc`; each submission has a unique id, so retries can't double count.
-- Rate limits: 30 submissions per minute per account and 120 per IP; 20 logins per 15 minutes and 5 sign-ups per hour per IP; 5 admin logins per 15 minutes per IP.
+- Rate limits: 30 submissions per minute per account and 120 per IP; 30 wrong PINs per 15 minutes and 30 new accounts per hour per IP (successful logins and typos don't count); 5 admin logins per 15 minutes per IP.
 - Admin: bcrypt-checked password, signed httpOnly `SameSite=Strict` session cookie (12 hours).
 - Security headers: Content-Security-Policy, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
 

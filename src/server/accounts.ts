@@ -8,13 +8,16 @@ import type { ProfileInput } from "@/lib/validation";
 import { Entry } from "@/models/entry";
 import { User, type UserDoc } from "@/models/user";
 import { isActiveMajlis, majlisName } from "./majalis";
-import { hitRateLimit } from "./rate-limit";
+import { hitRateLimit, underRateLimit } from "./rate-limit";
 import { ready } from "./ready";
 import { createSession, readSession } from "./session";
 
 const BCRYPT_COST = 10;
-const LOGIN_LIMIT = { max: 20, windowMs: 15 * 60_000 }; // per IP
-const SIGNUP_LIMIT = { max: 5, windowMs: 60 * 60_000 }; // per IP
+// Per IP. Generous on purpose: a whole majlis on one Wi-Fi, or many phones
+// behind one mobile-network IP, must be able to sign up together. Only
+// wrong PINs and created accounts count; each account also has its own lockout.
+const LOGIN_FAILS = { max: 30, windowMs: 15 * 60_000 };
+const SIGNUPS = { max: 30, windowMs: 60 * 60_000 };
 
 // A 4-digit PIN has 10,000 values, so wrong tries lock the account for longer
 // and longer: 5 → 15 min, 10 → 1 hour, 15+ → 24 hours. A right PIN resets it.
@@ -95,9 +98,13 @@ export async function signup(rawPhone: string, rawPin: string, meta: Meta): Prom
   if (isWeakPin(pin)) return { ok: false, error: "weak_pin" };
 
   await ready();
-  if (!(await hitRateLimit(`signup:${meta.ipHash}`, SIGNUP_LIMIT.max, now, SIGNUP_LIMIT.windowMs))) {
+  const signupKey = `signups:${meta.ipHash}`;
+  if (!(await underRateLimit(signupKey, SIGNUPS.max, now, SIGNUPS.windowMs))) {
     return { ok: false, error: "rate_limited" };
   }
+  // Counts created accounts, and "already taken" answers so numbers can't be
+  // probed endlessly. Typos and weak PINs above don't count.
+  const countSignup = () => hitRateLimit(signupKey, SIGNUPS.max, now, SIGNUPS.windowMs);
 
   let user: UserDoc;
   try {
@@ -110,9 +117,13 @@ export async function signup(rawPhone: string, rawPin: string, meta: Meta): Prom
     });
     user = created.toObject() as UserDoc;
   } catch (error) {
-    if (isDuplicateKey(error)) return { ok: false, error: "phone_taken" };
+    if (isDuplicateKey(error)) {
+      await countSignup();
+      return { ok: false, error: "phone_taken" };
+    }
     throw error;
   }
+  await countSignup();
 
   const userId = user._id.toString();
   const claimed = await claimDeviceHistory(userId, meta.deviceId);
@@ -126,7 +137,8 @@ export async function login(rawPhone: string, rawPin: string, meta: Meta): Promi
   const pin = normalizePin(rawPin);
 
   await ready();
-  if (!(await hitRateLimit(`login:${meta.ipHash}`, LOGIN_LIMIT.max, now, LOGIN_LIMIT.windowMs))) {
+  const failKey = `login-fails:${meta.ipHash}`;
+  if (!(await underRateLimit(failKey, LOGIN_FAILS.max, now, LOGIN_FAILS.windowMs))) {
     return { ok: false, error: "rate_limited" };
   }
 
@@ -141,6 +153,8 @@ export async function login(rawPhone: string, rawPin: string, meta: Meta): Promi
 
   const pinOk = await bcrypt.compare(isValidPinFormat(pin) ? pin : "x", user?.pinHash ?? DUMMY_HASH);
   if (!user || !pinOk) {
+    // Only wrong tries count towards the per-IP limit.
+    await hitRateLimit(failKey, LOGIN_FAILS.max, now, LOGIN_FAILS.windowMs);
     if (user) {
       const updated = await User.findOneAndUpdate(
         { _id: user._id },

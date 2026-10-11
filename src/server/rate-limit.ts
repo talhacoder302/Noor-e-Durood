@@ -25,3 +25,19 @@ export async function hitRateLimit(
 
   return doc.n <= limit;
 }
+
+/**
+ * True while the key is still under its limit, without counting this call.
+ * Pair with hitRateLimit when only some outcomes should count (e.g. only
+ * wrong PINs, or only accounts actually created).
+ */
+export async function underRateLimit(
+  key: string,
+  limit: number,
+  now: Date = new Date(),
+  windowMs: number = MINUTE_MS,
+): Promise<boolean> {
+  const bucket = Math.floor(now.getTime() / windowMs);
+  const doc = await RateLimit.findById(`${key}:${bucket}`, { n: 1 }).lean<RateLimitDoc>();
+  return (doc?.n ?? 0) < limit;
+}

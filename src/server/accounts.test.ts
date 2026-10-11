@@ -53,12 +53,20 @@ describe("signup", () => {
     expect(await User.countDocuments()).toBe(0);
   });
 
-  it("limits how many accounts one IP can create", async () => {
+  it("lets a whole majlis sign up from one Wi-Fi, but not unlimited accounts", async () => {
     const ipHash = "same-ip";
+    // Typos and weak PINs don't use up the allowance.
+    for (let i = 0; i < 10; i++) await signup("123", "4827", meta({ ipHash }));
+    for (let i = 0; i < 10; i++) await signup("03001234567", "1111", meta({ ipHash }));
+
     const results = [];
-    for (let i = 0; i < 6; i++) results.push(await signup(`0300123456${i}`, "4827", meta({ ipHash })));
-    expect(results.filter((r) => r.ok)).toHaveLength(5);
-    expect(results[5]).toEqual({ ok: false, error: "rate_limited" });
+    for (let i = 0; i < 31; i++) {
+      results.push(await signup(`03001${String(i).padStart(6, "0")}`, "4827", meta({ ipHash })));
+    }
+    expect(results.slice(0, 30).every((r) => r.ok)).toBe(true);
+    expect(results[30]).toEqual({ ok: false, error: "rate_limited" });
+    // Another connection is unaffected.
+    expect(await signup("03009999999", "4827", meta({ ipHash: "other-ip" }))).toMatchObject({ ok: true });
   });
 });
 
@@ -100,6 +108,22 @@ describe("login", () => {
       if (!last.ok && last.error === "locked") now = new Date(now.getTime() + (last.retryAfterMinutes ?? 0) * 60_000 + 1000);
     }
     expect(last).toEqual({ ok: false, error: "locked", retryAfterMinutes: 60 });
+  });
+
+  it("never counts successful logins against the IP", async () => {
+    const ipHash = "shared-wifi";
+    for (let i = 0; i < 40; i++) {
+      expect(await login("03001234567", "4827", meta({ ipHash }))).toMatchObject({ ok: true });
+    }
+  });
+
+  it("limits wrong PINs from one IP across many numbers", async () => {
+    const ipHash = "guesser";
+    for (let i = 0; i < 30; i++) {
+      expect(await login(`0300${String(i).padStart(7, "0")}`, "4827", meta({ ipHash }))).toEqual({ ok: false, error: "wrong" });
+    }
+    expect(await login("03001234567", "4827", meta({ ipHash }))).toEqual({ ok: false, error: "rate_limited" });
+    expect(await login("03001234567", "4827", meta({ ipHash: "someone-else" }))).toMatchObject({ ok: true });
   });
 
   it("refuses a disabled account", async () => {
