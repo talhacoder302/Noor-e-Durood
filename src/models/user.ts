@@ -59,5 +59,7 @@ const userSchema = new Schema<UserDoc>(
 userSchema.index({ phone: 1 }, { unique: true });
 userSchema.index({ majlisId: 1 });
 userSchema.index({ createdAt: -1 });
+// Leaderboard order and rank lookups.
+userSchema.index({ totalCount: -1, createdAt: 1 });
 
 export const User: Model<UserDoc> = (models.User as Model<UserDoc>) ?? model("User", userSchema);

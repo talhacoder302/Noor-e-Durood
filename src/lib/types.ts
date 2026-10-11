@@ -33,6 +33,35 @@ export type MySummary = {
   last7: { day: string; count: number }[];
 };
 
+/** One line of the public leaderboard. Never contains the phone number. */
+export type LeaderboardRow = {
+  id: string;
+  rank: number;
+  name: string;
+  /** Majlis name, or the "other" text the user typed; "" if none. */
+  majlis: string;
+  city: string;
+  total: number;
+};
+
+/** An account's public page (linked from the leaderboard). Never contains the phone number. */
+export type PublicProfile = {
+  id: string;
+  name: string;
+  majlis: string;
+  city: string;
+  age: number | null;
+  /** Karachi month (YYYY-MM) the account was created. */
+  joined: string;
+  /** Position among all listed accounts; null before the first durood. */
+  rank: number | null;
+  total: number;
+  today: number;
+  month: number;
+  /** Oldest first, always 7 entries ending today. */
+  last7: { day: string; count: number }[];
+};
+
 /** What the browser may know about the logged-in user (never the full phone or PIN). */
 export type PublicUser = {
   id: string;
