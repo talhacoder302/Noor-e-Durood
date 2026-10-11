@@ -8,6 +8,7 @@ export type PublicSettings = {
   announcement: string;
   paused: boolean;
   fridayMessage: { ur: string; en: string };
+  leaderboardShowNames: boolean;
 };
 
 /**
@@ -23,5 +24,6 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     announcement: s.announcement.trim(),
     paused: s.paused,
     fridayMessage: { ur: s.fridayMessageUr, en: s.fridayMessageEn },
+    leaderboardShowNames: s.leaderboardShowNames,
   };
 }

@@ -32,6 +32,8 @@ const SETTINGS_DEFAULTS = {
   // Empty means the built-in Friday text (src/lib/friday.ts).
   fridayMessageUr: "",
   fridayMessageEn: "",
+  // Leaderboard is anonymous until the admin allows names and profiles.
+  leaderboardShowNames: false,
 };
 
 function karachiDay(date = new Date()) {

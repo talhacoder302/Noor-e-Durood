@@ -15,6 +15,8 @@ export type SettingsDoc = {
   /** Friday banner text; empty means the built-in default. */
   fridayMessageUr: string;
   fridayMessageEn: string;
+  /** Leaderboard shows names and opens profiles; off = anonymous counts only. */
+  leaderboardShowNames: boolean;
 };
 
 const settingsSchema = new Schema<SettingsDoc>(
@@ -30,6 +32,7 @@ const settingsSchema = new Schema<SettingsDoc>(
     paused: { type: Boolean, default: false },
     fridayMessageUr: { type: String, default: "" },
     fridayMessageEn: { type: String, default: "" },
+    leaderboardShowNames: { type: Boolean, default: false },
   },
   { collection: "settings", versionKey: false },
 );

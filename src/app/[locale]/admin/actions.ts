@@ -18,6 +18,7 @@ import {
   requireAdmin,
 } from "@/server/admin-auth";
 import { createMajlis, MAJALIS_TAG, updateMajlis } from "@/server/majalis";
+import { LEADERBOARD_TAG } from "@/server/leaderboard";
 import { PUBLIC_SETTINGS_TAG } from "@/server/public-settings";
 import { getClientIp, hashIp } from "@/server/request-meta";
 import { updateSettings } from "@/server/settings";
@@ -145,6 +146,7 @@ const settingsSchema = z.object({
   fridayMessageUr: z.string().trim().max(800),
   fridayMessageEn: z.string().trim().max(800),
   paused: z.boolean(),
+  leaderboardShowNames: z.boolean(),
 });
 
 export async function saveSettingsAction(_prev: ActionState, form: FormData): Promise<ActionState> {
@@ -156,6 +158,7 @@ export async function saveSettingsAction(_prev: ActionState, form: FormData): Pr
     fridayMessageUr: form.get("fridayMessageUr") ?? "",
     fridayMessageEn: form.get("fridayMessageEn") ?? "",
     paused: form.get("paused") === "on",
+    leaderboardShowNames: form.get("leaderboardShowNames") === "on",
   });
   if (!parsed.success) {
     return { status: "error", code: "invalid", detail: parsed.error.issues[0]?.path.join(".") };
@@ -166,6 +169,7 @@ export async function saveSettingsAction(_prev: ActionState, form: FormData): Pr
 
   await updateSettings(parsed.data);
   updateTag(PUBLIC_SETTINGS_TAG);
+  updateTag(LEADERBOARD_TAG);
   refresh();
   return { status: "ok" };
 }

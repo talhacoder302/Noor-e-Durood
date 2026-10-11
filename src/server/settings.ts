@@ -20,6 +20,7 @@ function toSettings(doc: SettingsDoc): AppSettings {
     // Older documents may not have these fields yet.
     fridayMessageUr: doc.fridayMessageUr || DEFAULT_FRIDAY_MESSAGE.ur,
     fridayMessageEn: doc.fridayMessageEn || DEFAULT_FRIDAY_MESSAGE.en,
+    leaderboardShowNames: doc.leaderboardShowNames ?? false,
   };
 }
 

@@ -16,6 +16,7 @@ export type SettingsValues = {
   fridayMessageUr: string;
   fridayMessageEn: string;
   paused: boolean;
+  leaderboardShowNames: boolean;
 };
 
 const textareaClass =
@@ -56,6 +57,14 @@ export function SettingsForm({ values }: { values: SettingsValues }) {
           <span className="text-xs text-muted-foreground">{t("pausedHint")}</span>
         </span>
         <Switch name="paused" defaultChecked={values.paused} />
+      </label>
+
+      <label className="flex items-center justify-between gap-3 rounded-xl border p-3 text-sm">
+        <span>
+          <span className="block font-medium">{t("leaderboardShowNames")}</span>
+          <span className="text-xs text-muted-foreground">{t("leaderboardShowNamesHint")}</span>
+        </span>
+        <Switch name="leaderboardShowNames" defaultChecked={values.leaderboardShowNames} />
       </label>
 
       <label className="block space-y-1.5 text-sm">
