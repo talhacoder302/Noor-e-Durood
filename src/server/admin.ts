@@ -260,6 +260,7 @@ export type AdminUser = {
   disabled: boolean;
   disabledReason: string;
   locked: boolean;
+  isAdmin: boolean;
 };
 
 export type UserFilter = {
@@ -306,6 +307,7 @@ export async function listUsers(filter: UserFilter, now: Date = new Date()) {
     disabled: Boolean(u.disabled),
     disabledReason: u.disabledReason ?? "",
     locked: Boolean(u.lockedUntil && u.lockedUntil > now),
+    isAdmin: u.isAdmin === true,
   }));
   return { users, nextBefore: rows.length > PAGE_SIZE ? users[users.length - 1].createdAt : null };
 }
@@ -327,6 +329,12 @@ export async function resetUserPin(userId: string, rawPin: string): Promise<Rese
   if (result.matchedCount === 0) return { ok: false, error: "not_found" };
   await deleteAllSessions(userId);
   return { ok: true };
+}
+
+/** Admin accounts may open the panel (together with the admin password). */
+export async function setUserAdmin(userId: string, isAdmin: boolean) {
+  await ready();
+  await User.updateOne({ _id: userId }, isAdmin ? { $set: { isAdmin: true } } : { $unset: { isAdmin: "" } });
 }
 
 /** Disabling stops logins and submissions and logs the user out everywhere. */

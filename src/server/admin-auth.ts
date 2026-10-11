@@ -4,8 +4,11 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
 import { getEnv } from "@/lib/env";
+import { User, type UserDoc } from "@/models/user";
+import { getSessionUser } from "./accounts";
 import { hitRateLimit } from "./rate-limit";
 import { ready } from "./ready";
+import { SESSION_COOKIE } from "./session";
 
 export const ADMIN_COOKIE = "nd_admin";
 const SESSION_MS = 12 * 60 * 60_000;
@@ -72,11 +75,44 @@ export async function attemptAdminLogin(password: string, ipHash: string, now: D
   return { ok: true, ...createSessionToken(now.getTime()) };
 }
 
-export async function isAdmin(): Promise<boolean> {
-  // Request-time only: the expiry check reads the clock.
+/**
+ * Who may open the admin panel:
+ * - an account marked admin (Users page) that is logged in, AND
+ * - the admin password entered in this browser (12 h cookie).
+ * Until the first admin account exists ("setup"), the password alone is enough,
+ * so the first admin can mark their own account.
+ */
+export type AdminAccess =
+  | { ok: true; setup: boolean }
+  | { ok: false; need: "account"; user: UserDoc | null }
+  | { ok: false; need: "password" };
+
+/** The decision itself, from the two cookie values (tested directly). */
+export async function adminAccessFor(
+  sessionToken: string | undefined,
+  adminToken: string | undefined,
+  now: number = Date.now(),
+): Promise<AdminAccess> {
+  await ready();
+  const [admins, user] = await Promise.all([
+    User.countDocuments({ isAdmin: true, disabled: { $ne: true } }),
+    getSessionUser(sessionToken),
+  ]);
+  const setup = admins === 0;
+  if (!setup && !user?.isAdmin) return { ok: false, need: "account", user };
+  if (!verifySessionToken(adminToken, now)) return { ok: false, need: "password" };
+  return { ok: true, setup };
+}
+
+export async function getAdminAccess(): Promise<AdminAccess> {
+  // Request-time only: cookies, and the expiry check reads the clock.
   await connection();
   const store = await cookies();
-  return verifySessionToken(store.get(ADMIN_COOKIE)?.value);
+  return adminAccessFor(store.get(SESSION_COOKIE)?.value, store.get(ADMIN_COOKIE)?.value);
+}
+
+export async function isAdmin(): Promise<boolean> {
+  return (await getAdminAccess()).ok;
 }
 
 /** Every admin action and page calls this first. */

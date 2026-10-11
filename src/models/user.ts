@@ -20,6 +20,8 @@ export type UserDoc = {
   lockedUntil?: Date;
 
   // Set by an admin.
+  /** May open the admin panel (together with the admin password). */
+  isAdmin?: boolean;
   disabled: boolean;
   disabledReason?: string;
 
@@ -44,6 +46,7 @@ const userSchema = new Schema<UserDoc>(
     city: { type: String },
     failedPins: { type: Number, default: 0 },
     lockedUntil: { type: Date },
+    isAdmin: { type: Boolean },
     disabled: { type: Boolean, default: false },
     disabledReason: { type: String },
     totalCount: { type: Number, default: 0 },
@@ -59,6 +62,7 @@ const userSchema = new Schema<UserDoc>(
 userSchema.index({ phone: 1 }, { unique: true });
 userSchema.index({ majlisId: 1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ isAdmin: 1 }, { sparse: true });
 // Leaderboard order and rank lookups.
 userSchema.index({ totalCount: -1, createdAt: 1 });
 

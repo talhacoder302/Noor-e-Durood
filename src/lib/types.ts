@@ -73,4 +73,6 @@ export type PublicUser = {
   majlisOther: string;
   age: number | null;
   city: string;
+  /** Account may open the admin panel (still needs the admin password). */
+  isAdmin: boolean;
 };

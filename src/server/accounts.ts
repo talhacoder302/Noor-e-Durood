@@ -46,6 +46,7 @@ export function toPublicUser(u: UserDoc, majlisName?: string, now: Date = new Da
     majlisOther: u.majlisOther ?? "",
     age: u.birthYear ? now.getFullYear() - u.birthYear : null,
     city: u.city ?? "",
+    isAdmin: u.isAdmin === true,
   };
 }
 
