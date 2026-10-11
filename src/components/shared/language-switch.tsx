@@ -7,9 +7,13 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
 export function LanguageSwitch() {
+  return <LanguageSwitchLink pathname={usePathname()} />;
+}
+
+/** Same page in the other language; the home page while the path isn't known yet. */
+export function LanguageSwitchLink({ pathname }: { pathname: string }) {
   const t = useTranslations("Header");
   const locale = useLocale() as Locale;
-  const pathname = usePathname();
   const target: Locale = locale === "ur" ? "en" : "ur";
 
   return (

@@ -1,7 +1,9 @@
 import { useTranslations } from "next-intl";
+import { Suspense } from "react";
 import { UserButton } from "@/components/auth/user-button";
 import { Link } from "@/i18n/navigation";
-import { LanguageSwitch } from "./language-switch";
+import { LanguageSwitch, LanguageSwitchLink } from "./language-switch";
+import { MainNav, MainNavLinks } from "./main-nav";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
@@ -32,10 +34,16 @@ export function SiteHeader() {
 
         <nav className="flex shrink-0 items-center gap-0.5">
           <UserButton />
-          <LanguageSwitch />
+          {/* Both read the path, which some routes only know at request time. */}
+          <Suspense fallback={<LanguageSwitchLink pathname="/" />}>
+            <LanguageSwitch />
+          </Suspense>
           <ThemeToggle label={t("toggleTheme")} />
         </nav>
       </div>
+      <Suspense fallback={<MainNavLinks pathname={null} />}>
+        <MainNav />
+      </Suspense>
     </header>
   );
 }
