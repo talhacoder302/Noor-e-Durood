@@ -22,6 +22,18 @@ export type SettingsValues = {
 const textareaClass =
   "w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
+/** Switch with an "On" / "Off" word beside it, so its state is obvious. */
+function OnOffSwitch({ name, defaultChecked }: { name: string; defaultChecked: boolean }) {
+  const t = useTranslations("Admin");
+  return (
+    <span className="flex shrink-0 items-center gap-2">
+      <Switch name={name} defaultChecked={defaultChecked} />
+      <span className="w-6 text-xs text-muted-foreground peer-data-[state=checked]:hidden">{t("switchOff")}</span>
+      <span className="hidden w-6 text-xs font-medium text-brand peer-data-[state=checked]:inline">{t("switchOn")}</span>
+    </span>
+  );
+}
+
 export function SettingsForm({ values }: { values: SettingsValues }) {
   const t = useTranslations("Admin");
   const [, action, pending] = useActionState(async (prev: ActionState, form: FormData) => {
@@ -56,7 +68,7 @@ export function SettingsForm({ values }: { values: SettingsValues }) {
           <span className="block font-medium">{t("paused")}</span>
           <span className="text-xs text-muted-foreground">{t("pausedHint")}</span>
         </span>
-        <Switch name="paused" defaultChecked={values.paused} />
+        <OnOffSwitch name="paused" defaultChecked={values.paused} />
       </label>
 
       <label className="flex items-center justify-between gap-3 rounded-xl border p-3 text-sm">
@@ -64,7 +76,7 @@ export function SettingsForm({ values }: { values: SettingsValues }) {
           <span className="block font-medium">{t("leaderboardShowNames")}</span>
           <span className="text-xs text-muted-foreground">{t("leaderboardShowNamesHint")}</span>
         </span>
-        <Switch name="leaderboardShowNames" defaultChecked={values.leaderboardShowNames} />
+        <OnOffSwitch name="leaderboardShowNames" defaultChecked={values.leaderboardShowNames} />
       </label>
 
       <label className="block space-y-1.5 text-sm">

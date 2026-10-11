@@ -171,7 +171,9 @@
     "loginWithAdminAccount": "To open the admin panel, first log in with your admin account (mobile number and PIN), then enter the admin password.",
     "notAdminAccount": "The account you're logged in with is not an admin. The admin panel only opens for admin accounts.",
     "loginWithAccount": "Log in with account",
-    "setupNotice": "There is no admin account yet, so the password alone opens the panel. Use \"Make admin\" on your own account in Users; after that the panel needs both an admin account login and the password."
+    "setupNotice": "There is no admin account yet, so the password alone opens the panel. Use \"Make admin\" on your own account in Users; after that the panel needs both an admin account login and the password.",
+    "switchOn": "On",
+    "switchOff": "Off"
   },
   "Offline": {
     "title": "You're offline",
