@@ -9,16 +9,21 @@ import { formatCount, type NumberLocale } from "@/lib/format";
 import type { LeaderboardRow } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { getCachedLeaderboard } from "@/server/leaderboard";
+import { getPublicSettings } from "@/server/public-settings";
 import { Avatar, RankBadge } from "./bits";
 
-/** Top accounts, highest count first. Each row opens that person's profile. */
+/**
+ * Top accounts, highest count first. When the admin allows names, each row
+ * opens that person's profile; otherwise rows are anonymous and don't open.
+ */
 export async function LeaderboardList({ locale }: { locale: NumberLocale }) {
   // Request time only, so the build never reads the database.
   await connection();
   const t = await getTranslations("Leaderboard");
   let rows: LeaderboardRow[] | null = null;
   try {
-    rows = await getCachedLeaderboard();
+    const { leaderboardShowNames } = await getPublicSettings();
+    rows = await getCachedLeaderboard(leaderboardShowNames);
   } catch (error) {
     unstable_rethrow(error);
     console.error("Could not load the leaderboard:", error);
@@ -42,21 +47,19 @@ export async function LeaderboardList({ locale }: { locale: NumberLocale }) {
   const align = locale === "ur" ? "text-right" : "text-left";
   return (
     <ol className="space-y-2">
-      {rows.map((row) => (
-        <li key={row.id}>
-          <Link
-            href={`/leaderboard/${row.id}`}
-            className={cn(
-              "flex items-center gap-3 rounded-xl border bg-card px-3 py-2.5 transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
-              row.rank <= 3 && "border-gold/50",
-            )}
-          >
+      {rows.map((row, i) => {
+        const rowClass = cn(
+          "flex items-center gap-3 rounded-xl border bg-card px-3 py-2.5",
+          row.rank <= 3 && "border-gold/50",
+        );
+        const body = (
+          <>
             <RankBadge rank={row.rank} locale={locale} />
             <Avatar name={row.name} className="size-10" />
             <span className="flex min-w-0 flex-1 flex-col">
               {/* Names may be Urdu or English on either page; dir="auto" keeps each readable. */}
               <span dir="auto" className={cn("truncate font-medium", align)}>
-                {row.name || t("member")}
+                {row.id === null ? t("anonymous") : row.name || t("member")}
               </span>
               {(row.majlis || row.city) && (
                 <span dir="auto" className={cn("truncate text-xs text-muted-foreground", align)}>
@@ -68,10 +71,27 @@ export async function LeaderboardList({ locale }: { locale: NumberLocale }) {
               <span className="num text-lg font-bold text-brand">{formatCount(row.total, locale)}</span>
               <span className="text-[11px] text-muted-foreground">{t("durood")}</span>
             </span>
-            <Chevron className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-          </Link>
-        </li>
-      ))}
+          </>
+        );
+        return row.id === null ? (
+          <li key={i} className={rowClass}>
+            {body}
+          </li>
+        ) : (
+          <li key={row.id}>
+            <Link
+              href={`/leaderboard/${row.id}`}
+              className={cn(
+                rowClass,
+                "transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
+              )}
+            >
+              {body}
+              <Chevron className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+            </Link>
+          </li>
+        );
+      })}
     </ol>
   );
 }

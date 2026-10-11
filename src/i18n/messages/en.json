@@ -160,7 +160,9 @@
     "majlisCity": "City",
     "majlisOrder": "Order",
     "majlisActive": "Active",
-    "majlisAdded": "Majlis added"
+    "majlisAdded": "Majlis added",
+    "leaderboardShowNames": "Show names and profiles on the leaderboard",
+    "leaderboardShowNamesHint": "When off, the leaderboard shows only rank and count, names appear as \"Anonymous\" and profiles don't open. Takes effect within about a minute"
   },
   "Offline": {
     "title": "You're offline",
@@ -307,7 +309,7 @@
     "invalidField": "This field isn't valid: {field}",
     "welcome": "Your account is ready! Add your name and majlis if you like.",
     "later": "Not now",
-    "publicNote": "Your name, majlis, city and age are shown to everyone on your leaderboard profile. Your phone number is never shown."
+    "publicNote": "If the admin allows it, your name, majlis, city and age can be shown to everyone on your leaderboard profile. Your phone number is never shown."
   },
   "Leaderboard": {
     "metaTitle": "Leaderboard",
@@ -329,6 +331,8 @@
     "today": "Today",
     "month": "This month",
     "notFound": "This profile does not exist.",
-    "cta": "Send Durood Shareef too"
+    "cta": "Send Durood Shareef too",
+    "anonymous": "Anonymous",
+    "private": "Profiles are not open to everyone right now."
   }
 }

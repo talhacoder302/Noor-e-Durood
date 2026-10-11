@@ -31,18 +31,27 @@ const majlisOf = (u: UserDoc, names: Map<string, string>) =>
 /**
  * Top accounts by all-time count, highest first. Equal counts share a rank
  * (1, 2, 2, 4); among equals, whoever joined first is listed first.
+ * With showNames off (the admin setting) rows carry only rank and count:
+ * no id, name, majlis or city ever leaves the server.
  */
-export async function getLeaderboard(limit: number = LEADERBOARD_SIZE): Promise<LeaderboardRow[]> {
+export async function getLeaderboard({
+  showNames,
+  limit = LEADERBOARD_SIZE,
+}: {
+  showNames: boolean;
+  limit?: number;
+}): Promise<LeaderboardRow[]> {
   await ready();
-  const users = await User.find(listed, PUBLIC_FIELDS)
+  const users = await User.find(listed, showNames ? PUBLIC_FIELDS : { totalCount: 1 })
     .sort({ totalCount: -1, createdAt: 1 })
     .limit(limit)
     .lean<UserDoc[]>();
-  const names = await majlisNames(users.map((u) => u.majlisId));
+  const names = showNames ? await majlisNames(users.map((u) => u.majlisId)) : new Map<string, string>();
 
   let rank = 0;
   return users.map((u, i) => {
     if (i === 0 || u.totalCount !== users[i - 1].totalCount) rank = i + 1;
+    if (!showNames) return { id: null, rank, name: "", majlis: "", city: "", total: u.totalCount };
     return {
       id: u._id.toString(),
       rank,
@@ -54,7 +63,10 @@ export async function getLeaderboard(limit: number = LEADERBOARD_SIZE): Promise<
   });
 }
 
-/** Public page for one account: profile fields, rank and counts. Null if unknown or disabled. */
+/**
+ * Public page for one account: profile fields, rank and counts. Null if
+ * unknown or disabled. Pages only call this when the admin allows names.
+ */
 export async function getPublicProfile(id: string, now: Date = new Date()): Promise<PublicProfile | null> {
   if (!OBJECT_ID.test(id)) return null;
   await ready();
@@ -96,11 +108,12 @@ export async function getPublicProfile(id: string, now: Date = new Date()): Prom
 // Cached for pages. Counts change all the time, so a short life is fine;
 // the short expire also keeps these out of the build-time prerender.
 
-export async function getCachedLeaderboard(): Promise<LeaderboardRow[]> {
+/** showNames comes from getPublicSettings(); it is part of the cache key. */
+export async function getCachedLeaderboard(showNames: boolean): Promise<LeaderboardRow[]> {
   "use cache";
   cacheLife({ stale: 30, revalidate: 30, expire: 120 });
   cacheTag(LEADERBOARD_TAG);
-  return getLeaderboard();
+  return getLeaderboard({ showNames });
 }
 
 export async function getCachedPublicProfile(id: string): Promise<PublicProfile | null> {

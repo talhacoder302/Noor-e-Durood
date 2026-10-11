@@ -26,7 +26,7 @@ describe("getLeaderboard", () => {
     await createTestUser({ name: "Off", totalCount: 5000, disabled: true });
     await createTestUser({ name: "New", totalCount: 0 });
 
-    const rows = await getLeaderboard();
+    const rows = await getLeaderboard({ showNames: true });
     expect(rows.map((r) => [r.id, r.rank])).toEqual([
       [b, 1],
       [c, 2], // joined before Ali, so listed first among the 500s
@@ -38,12 +38,26 @@ describe("getLeaderboard", () => {
 
   it("never returns phone numbers", async () => {
     await createTestUser({ name: "Ali", totalCount: 10 });
-    expect(JSON.stringify(await getLeaderboard())).not.toContain("+92");
+    expect(JSON.stringify(await getLeaderboard({ showNames: true }))).not.toContain("+92");
+  });
+
+  it("sends only rank and count when names are hidden", async () => {
+    const m = await Majlis.create({ name: "مجلس لاہور" });
+    const id = await createTestUser({ name: "Ali", totalCount: 900, majlisId: m._id.toString(), city: "Lahore" });
+    await createTestUser({ name: "Bilal", totalCount: 900 });
+
+    const rows = await getLeaderboard({ showNames: false });
+    expect(rows).toEqual([
+      { id: null, rank: 1, name: "", majlis: "", city: "", total: 900 },
+      { id: null, rank: 1, name: "", majlis: "", city: "", total: 900 },
+    ]);
+    const json = JSON.stringify(rows);
+    for (const secret of ["Ali", "Bilal", "Lahore", "مجلس", id, "+92"]) expect(json).not.toContain(secret);
   });
 
   it("stops at the limit", async () => {
     for (let i = 1; i <= 5; i++) await createTestUser({ totalCount: i });
-    const rows = await getLeaderboard(3);
+    const rows = await getLeaderboard({ showNames: true, limit: 3 });
     expect(rows.map((r) => r.total)).toEqual([5, 4, 3]);
   });
 });

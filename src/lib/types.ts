@@ -35,7 +35,8 @@ export type MySummary = {
 
 /** One line of the public leaderboard. Never contains the phone number. */
 export type LeaderboardRow = {
-  id: string;
+  /** Null when the admin keeps the leaderboard anonymous (name, majlis, city are "" too). */
+  id: string | null;
   rank: number;
   name: string;
   /** Majlis name, or the "other" text the user typed; "" if none. */

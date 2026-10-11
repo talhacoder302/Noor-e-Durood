@@ -11,6 +11,7 @@ import type { Locale } from "@/i18n/routing";
 import { countInWords, formatCount, type NumberLocale } from "@/lib/format";
 import type { PublicProfile } from "@/lib/types";
 import { getCachedPublicProfile } from "@/server/leaderboard";
+import { getPublicSettings } from "@/server/public-settings";
 import { Avatar, RankBadge } from "./bits";
 
 function monthName(month: string, locale: NumberLocale) {
@@ -53,8 +54,11 @@ export async function PublicProfileView({ params }: { params: Promise<{ locale: 
 
   let profile: PublicProfile | null = null;
   let failed = false;
+  let hidden = false;
   try {
-    profile = await getCachedPublicProfile(id);
+    // The admin can keep the leaderboard anonymous; then no profile opens.
+    hidden = !(await getPublicSettings()).leaderboardShowNames;
+    if (!hidden) profile = await getCachedPublicProfile(id);
   } catch (error) {
     unstable_rethrow(error);
     console.error("Could not load a public profile:", error);
@@ -78,7 +82,7 @@ export async function PublicProfileView({ params }: { params: Promise<{ locale: 
         {back}
         <Card>
           <CardContent className="py-6 text-center text-sm text-muted-foreground">
-            {failed ? t("error") : t("notFound")}
+            {failed ? t("error") : hidden ? t("private") : t("notFound")}
           </CardContent>
         </Card>
       </>
