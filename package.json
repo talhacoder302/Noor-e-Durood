@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.sw.json",
     "db:seed": "node scripts/seed.mjs",
-    "admin:hash": "node scripts/hash-password.mjs"
+    "admin:hash": "node scripts/hash-password.mjs",
+    "admin:account": "node scripts/admin-account.mjs"
   },
   "dependencies": {
     "@serwist/build": "^9.5.13",

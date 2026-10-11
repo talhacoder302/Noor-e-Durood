@@ -26,10 +26,11 @@ Urdu by default (right-to-left), with English at `/en`. Built for phones and slo
 - Installable app (PWA) with an offline page where the tasbeeh still works.
 - Light and dark mode.
 
-**For the admin** (`/admin`, one password)
+**For the admin** (`/admin`: an admin account login plus the admin password)
+- Admin accounts: mark any account as admin on the Users page. Once one exists, the panel needs that account logged in **and** the admin password (asked every 12 hours). Before the first admin account exists, the password alone opens the panel so you can mark yours. Admin accounts get an "Admin" link in the header.
 - Dashboard: total, today, month, active devices today, entries per hour today, last 30 days, and the largest recent entries (device id shortened, never an IP).
 - Entries list with filters (size, mobile number, time), showing who sent each one. Remove an entry with a reason: its count is taken back off every total.
-- Users: search by number or name, filter by majlis, reset a forgotten PIN, disable or enable an account.
+- Users: search by number or name, filter by majlis, reset a forgotten PIN, disable or enable an account, make or remove admins.
 - Majalis: add, edit, reorder and deactivate the list users choose from. The dashboard shows this month's totals per majlis.
 - Settings: limits per entry and per device per day, announcement, Friday text (Urdu and English), pause submissions.
 - "Recalculate totals" rebuilds every counter from the entries (a safety tool).
@@ -108,6 +109,7 @@ Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind CSS v4 · sh
 | `npm test` | Unit tests (Vitest, with an in-memory MongoDB) |
 | `npm run db:seed` | Create collections, Settings and counters |
 | `npm run admin:hash -- "password"` | Print a bcrypt hash for `ADMIN_PASSWORD` |
+| `npm run admin:account -- 0300… [--pin 1234] [--remove]` | Emergency: make an account admin (or remove it), optionally with a new PIN. Uses `.env.local` |
 
 ## API
 
