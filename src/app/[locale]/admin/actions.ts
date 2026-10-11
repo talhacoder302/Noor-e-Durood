@@ -8,6 +8,7 @@ import {
   recalculateTotals,
   removeEntry,
   resetUserPin,
+  setUserAdmin,
   setUserDisabled,
   type RecalcResult,
 } from "@/server/admin";
@@ -80,6 +81,16 @@ export async function enableUserAction(form: FormData): Promise<void> {
   const parsed = objectId.safeParse(form.get("userId"));
   if (!parsed.success) return;
   await setUserDisabled(parsed.data, false);
+  refresh();
+}
+
+export async function setAdminRoleAction(form: FormData): Promise<void> {
+  await requireAdmin();
+  const parsed = z
+    .object({ userId: objectId, isAdmin: z.enum(["1", "0"]) })
+    .safeParse({ userId: form.get("userId"), isAdmin: form.get("isAdmin") });
+  if (!parsed.success) return;
+  await setUserAdmin(parsed.data.userId, parsed.data.isAdmin === "1");
   refresh();
 }
 

@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense, use } from "react";
 import { z } from "zod";
-import { enableUserAction } from "@/app/[locale]/admin/actions";
+import { enableUserAction, setAdminRoleAction } from "@/app/[locale]/admin/actions";
 import { AdminGate } from "@/components/admin/admin-gate";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { AdminSkeleton } from "@/components/admin/admin-skeleton";
@@ -93,6 +93,7 @@ async function Users({ searchParams, locale }: { searchParams: Promise<SearchPar
                   <span className="num text-sm text-muted-foreground" dir="ltr">
                     {u.phone}
                   </span>
+                  {u.isAdmin && <Badge>{t("adminBadge")}</Badge>}
                   {u.disabled && <Badge variant="destructive">{t("disabledBadge")}</Badge>}
                   {u.locked && <Badge variant="outline">{t("lockedBadge")}</Badge>}
                   <span className="num ms-auto text-lg font-bold text-brand">{formatCount(u.totalCount, locale)}</span>
@@ -122,6 +123,13 @@ async function Users({ searchParams, locale }: { searchParams: Promise<SearchPar
                   ) : (
                     <DisableUserButton userId={u.id} label={label} />
                   )}
+                  <form action={setAdminRoleAction}>
+                    <input type="hidden" name="userId" value={u.id} />
+                    <input type="hidden" name="isAdmin" value={u.isAdmin ? "0" : "1"} />
+                    <Button type="submit" variant="ghost" size="sm">
+                      {u.isAdmin ? t("removeAdmin") : t("makeAdmin")}
+                    </Button>
+                  </form>
                 </div>
               </li>
             );

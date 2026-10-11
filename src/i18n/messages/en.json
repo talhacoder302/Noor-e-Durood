@@ -16,7 +16,8 @@
     "login": "Log in",
     "navLabel": "Main menu",
     "navHome": "Home",
-    "navLeaderboard": "Leaderboard"
+    "navLeaderboard": "Leaderboard",
+    "admin": "Admin"
   },
   "Me": {
     "metaTitle": "My count",
@@ -162,7 +163,15 @@
     "majlisActive": "Active",
     "majlisAdded": "Majlis added",
     "leaderboardShowNames": "Show names and profiles on the leaderboard",
-    "leaderboardShowNamesHint": "When off, the leaderboard shows only rank and count, names appear as \"Anonymous\" and profiles don't open. Takes effect within about a minute"
+    "leaderboardShowNamesHint": "When off, the leaderboard shows only rank and count, names appear as \"Anonymous\" and profiles don't open. Takes effect within about a minute",
+    "adminBadge": "Admin",
+    "makeAdmin": "Make admin",
+    "removeAdmin": "Remove admin",
+    "accountTitle": "Admin account",
+    "loginWithAdminAccount": "To open the admin panel, first log in with your admin account (mobile number and PIN), then enter the admin password.",
+    "notAdminAccount": "The account you're logged in with is not an admin. The admin panel only opens for admin accounts.",
+    "loginWithAccount": "Log in with account",
+    "setupNotice": "There is no admin account yet, so the password alone opens the panel. Use \"Make admin\" on your own account in Users; after that the panel needs both an admin account login and the password."
   },
   "Offline": {
     "title": "You're offline",

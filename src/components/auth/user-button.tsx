@@ -1,6 +1,6 @@
 "use client";
 
-import { LogInIcon, UserRoundIcon } from "lucide-react";
+import { LogInIcon, ShieldCheckIcon, UserRoundIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -33,9 +33,17 @@ export function UserButton() {
 
   const label = session.user.name || session.user.phoneMasked;
   return (
-    <Link href="/mera-hisaab" className={pill} aria-label={t("myCount")} title={label}>
-      <UserRoundIcon className="size-5 text-brand" />
-      <span className="hidden max-w-28 truncate sm:inline">{label}</span>
-    </Link>
+    <>
+      {session.user.isAdmin && (
+        <Link href="/admin" className={cn(pill, "text-gold")} aria-label={t("admin")} title={t("admin")}>
+          <ShieldCheckIcon className="size-5" />
+          <span className="hidden sm:inline">{t("admin")}</span>
+        </Link>
+      )}
+      <Link href="/mera-hisaab" className={pill} aria-label={t("myCount")} title={label}>
+        <UserRoundIcon className="size-5 text-brand" />
+        <span className="hidden max-w-28 truncate sm:inline">{label}</span>
+      </Link>
+    </>
   );
 }
