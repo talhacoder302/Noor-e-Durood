@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 
 // The list users pick their majlis from. Managed in the admin panel; users
 // can also choose "other" and type a name (stored on the user instead).
@@ -26,4 +27,4 @@ const majlisSchema = new Schema<MajlisDoc>(
 
 majlisSchema.index({ active: 1, order: 1 });
 
-export const Majlis: Model<MajlisDoc> = (models.Majlis as Model<MajlisDoc>) ?? model("Majlis", majlisSchema);
+export const Majlis: Model<MajlisDoc> = defineModel<MajlisDoc>("Majlis", majlisSchema);

@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 
 export type DeviceStatDoc = {
   deviceId: string;
@@ -31,5 +32,4 @@ deviceStatSchema.index({ deviceId: 1 }, { unique: true });
 deviceStatSchema.index({ blocked: 1 }, { sparse: true });
 
 export const DeviceStat: Model<DeviceStatDoc> =
-  (models.DeviceStat as Model<DeviceStatDoc>) ??
-  model("DeviceStat", deviceStatSchema);
+  defineModel<DeviceStatDoc>("DeviceStat", deviceStatSchema);

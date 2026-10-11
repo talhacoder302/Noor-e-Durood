@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 import {
   DEFAULT_MAX_PER_DEVICE_PER_DAY,
   DEFAULT_MAX_PER_ENTRY,
@@ -38,4 +39,4 @@ const settingsSchema = new Schema<SettingsDoc>(
 );
 
 export const Settings: Model<SettingsDoc> =
-  (models.Settings as Model<SettingsDoc>) ?? model("Settings", settingsSchema);
+  defineModel<SettingsDoc>("Settings", settingsSchema);

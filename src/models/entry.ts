@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 import type { DuroodMode } from "@/lib/types";
 
 export type EntryDoc = {
@@ -50,4 +51,4 @@ entrySchema.index({ majlisId: 1, day: 1 });
 entrySchema.index({ day: 1, count: -1 });
 
 export const Entry: Model<EntryDoc> =
-  (models.Entry as Model<EntryDoc>) ?? model("Entry", entrySchema);
+  defineModel<EntryDoc>("Entry", entrySchema);

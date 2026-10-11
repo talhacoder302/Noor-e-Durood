@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 
 // _id is "global", "day:YYYY-MM-DD" or "month:YYYY-MM".
 // Only ever changed with atomic $inc (upsert). Never read-modify-write.
@@ -16,4 +17,4 @@ const counterSchema = new Schema<CounterDoc>(
 );
 
 export const Counter: Model<CounterDoc> =
-  (models.Counter as Model<CounterDoc>) ?? model("Counter", counterSchema);
+  defineModel<CounterDoc>("Counter", counterSchema);

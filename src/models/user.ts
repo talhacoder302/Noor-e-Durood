@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 
 export type UserDoc = {
   _id: { toString(): string };
@@ -66,4 +67,4 @@ userSchema.index({ isAdmin: 1 }, { sparse: true });
 // Leaderboard order and rank lookups.
 userSchema.index({ totalCount: -1, createdAt: 1 });
 
-export const User: Model<UserDoc> = (models.User as Model<UserDoc>) ?? model("User", userSchema);
+export const User: Model<UserDoc> = defineModel<UserDoc>("User", userSchema);

@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 
 // One document per key per minute window; MongoDB deletes them via TTL.
 export type RateLimitDoc = {
@@ -19,5 +20,4 @@ const rateLimitSchema = new Schema<RateLimitDoc>(
 rateLimitSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const RateLimit: Model<RateLimitDoc> =
-  (models.RateLimit as Model<RateLimitDoc>) ??
-  model("RateLimit", rateLimitSchema);
+  defineModel<RateLimitDoc>("RateLimit", rateLimitSchema);

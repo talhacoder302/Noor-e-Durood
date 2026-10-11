@@ -1,4 +1,5 @@
-import { model, models, Schema, type Model } from "mongoose";
+import { Schema, type Model } from "mongoose";
+import { defineModel } from "./define";
 
 // One document per logged-in phone/browser. The cookie holds a random token;
 // only its SHA-256 is stored here, so a database leak can't be used to log in.
@@ -28,4 +29,4 @@ sessionSchema.index({ userId: 1 });
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const Session: Model<SessionDoc> =
-  (models.Session as Model<SessionDoc>) ?? model("Session", sessionSchema);
+  defineModel<SessionDoc>("Session", sessionSchema);
