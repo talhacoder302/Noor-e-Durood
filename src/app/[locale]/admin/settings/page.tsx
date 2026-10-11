@@ -22,7 +22,10 @@ async function SettingsView() {
           <CardTitle className="text-lg leading-loose">{t("settingsTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <SettingsForm values={settings} />
+          {/* React resets a form after its action finishes, and the switches reset
+              to the value they mounted with (not the new one). Remounting on every
+              saved change starts the form from what's actually stored. */}
+          <SettingsForm key={JSON.stringify(settings)} values={settings} />
         </CardContent>
       </Card>
 

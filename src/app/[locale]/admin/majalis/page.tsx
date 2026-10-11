@@ -31,7 +31,9 @@ async function Majalis() {
         {majalis.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("noMajalis")}</p>
         ) : (
-          majalis.map((m) => <EditMajlisRow key={m.id} m={m} />)
+          // Keyed on the saved values too: after a save the row remounts with them
+          // (React resets the form, and switches would snap back otherwise).
+          majalis.map((m) => <EditMajlisRow key={JSON.stringify(m)} m={m} />)
         )}
       </section>
     </div>
