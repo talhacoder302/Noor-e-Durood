@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { normalizePhone } from "@/lib/phone";
-import { isValidPinFormat, isWeakPin, normalizePin, PIN_LENGTH } from "@/lib/pin";
+import { isValidPinFormat, isWeakPin, normalizePin } from "@/lib/pin";
 import type { PublicUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { PinInput } from "./pin-input";
 import { safeNext, setSessionUser } from "./session-store";
 
 type Mode = "login" | "signup";
@@ -138,37 +139,18 @@ export function AuthForm() {
 
           <label className="block space-y-1.5">
             <span className="text-sm font-medium">{t("pin")}</span>
-            <Input
+            <PinInput
               name="pin"
-              type="password"
-              inputMode="numeric"
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              dir="ltr"
-              maxLength={PIN_LENGTH}
-              placeholder="••••"
               value={pin}
-              onChange={(e) => setPin(e.target.value.slice(0, PIN_LENGTH))}
-              className="num h-12 text-center text-2xl tracking-[0.5em]"
-              required
+              onChange={setPin}
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
             />
           </label>
 
           {mode === "signup" && (
             <label className="block space-y-1.5">
               <span className="text-sm font-medium">{t("pinConfirm")}</span>
-              <Input
-                name="pin2"
-                type="password"
-                inputMode="numeric"
-                autoComplete="new-password"
-                dir="ltr"
-                maxLength={PIN_LENGTH}
-                placeholder="••••"
-                value={pin2}
-                onChange={(e) => setPin2(e.target.value.slice(0, PIN_LENGTH))}
-                className="num h-12 text-center text-2xl tracking-[0.5em]"
-                required
-              />
+              <PinInput name="pin2" value={pin2} onChange={setPin2} autoComplete="new-password" />
             </label>
           )}
 

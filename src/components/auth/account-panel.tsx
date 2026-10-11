@@ -7,9 +7,9 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { isValidPinFormat, isWeakPin, normalizePin, PIN_LENGTH } from "@/lib/pin";
+import { isValidPinFormat, isWeakPin, normalizePin } from "@/lib/pin";
 import type { PublicUser } from "@/lib/types";
+import { PinInput } from "./pin-input";
 import { setSessionUser } from "./session-store";
 
 async function postJson(url: string, body: unknown) {
@@ -21,7 +21,7 @@ async function postJson(url: string, body: unknown) {
   return { ok: res.ok, data: (await res.json().catch(() => ({}))) as { error?: string } };
 }
 
-function PinInput({
+function PinField({
   value,
   onChange,
   label,
@@ -35,17 +35,7 @@ function PinInput({
   return (
     <label className="block space-y-1.5">
       <span className="text-sm">{label}</span>
-      <Input
-        type="password"
-        inputMode="numeric"
-        autoComplete={autoComplete}
-        dir="ltr"
-        maxLength={PIN_LENGTH}
-        value={value}
-        onChange={(e) => onChange(e.target.value.slice(0, PIN_LENGTH))}
-        className="num h-11 text-center text-xl tracking-[0.5em]"
-        required
-      />
+      <PinInput value={value} onChange={onChange} autoComplete={autoComplete} size="md" />
     </label>
   );
 }
@@ -87,9 +77,9 @@ function ChangePin() {
     <form onSubmit={onSubmit} className="space-y-3">
       <p className="text-sm font-medium">{t("changePin")}</p>
       <div className="grid gap-3 sm:grid-cols-3">
-        <PinInput value={oldPin} onChange={setOldPin} label={t("oldPin")} autoComplete="current-password" />
-        <PinInput value={newPin} onChange={setNewPin} label={t("newPin")} autoComplete="new-password" />
-        <PinInput value={newPin2} onChange={setNewPin2} label={t("pinConfirm")} autoComplete="new-password" />
+        <PinField value={oldPin} onChange={setOldPin} label={t("oldPin")} autoComplete="current-password" />
+        <PinField value={newPin} onChange={setNewPin} label={t("newPin")} autoComplete="new-password" />
+        <PinField value={newPin2} onChange={setNewPin2} label={t("pinConfirm")} autoComplete="new-password" />
       </div>
       <Button type="submit" variant="outline" disabled={pending} className="h-11 w-full sm:w-auto">
         {pending && <Loader2Icon className="size-4 animate-spin" />}

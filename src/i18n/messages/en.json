@@ -280,7 +280,9 @@
       "rate_limited": "Too many tries. Please wait a little.",
       "server": "Something went wrong. Please try again.",
       "network": "Looks like an internet problem. Please try again."
-    }
+    },
+    "showPin": "Show PIN",
+    "hidePin": "Hide PIN"
   },
   "Profile": {
     "title": "My profile",
