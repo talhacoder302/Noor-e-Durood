@@ -13,7 +13,10 @@
     "switchLanguageLabel": "View in Urdu",
     "toggleTheme": "Toggle light or dark mode",
     "myCount": "My count",
-    "login": "Log in"
+    "login": "Log in",
+    "navLabel": "Main menu",
+    "navHome": "Home",
+    "navLeaderboard": "Leaderboard"
   },
   "Me": {
     "metaTitle": "My count",
@@ -303,6 +306,29 @@
     "saveFailed": "Couldn't save. Please try again.",
     "invalidField": "This field isn't valid: {field}",
     "welcome": "Your account is ready! Add your name and majlis if you like.",
-    "later": "Not now"
+    "later": "Not now",
+    "publicNote": "Your name, majlis, city and age are shown to everyone on your leaderboard profile. Your phone number is never shown."
+  },
+  "Leaderboard": {
+    "metaTitle": "Leaderboard",
+    "title": "Leaderboard",
+    "subtitle": "The {n} people who have sent the most Durood Shareef",
+    "empty": "No names here yet. Be the first to send Durood Shareef!",
+    "error": "The leaderboard could not load right now. Please check again shortly.",
+    "member": "Member",
+    "durood": "durood",
+    "rankLabel": "Leaderboard rank",
+    "back": "Back to leaderboard",
+    "profileTitle": "Profile",
+    "majlis": "Majlis",
+    "city": "City",
+    "age": "Age",
+    "ageYears": "{n} years",
+    "joined": "Joined",
+    "total": "All time",
+    "today": "Today",
+    "month": "This month",
+    "notFound": "This profile does not exist.",
+    "cta": "Send Durood Shareef too"
   }
 }

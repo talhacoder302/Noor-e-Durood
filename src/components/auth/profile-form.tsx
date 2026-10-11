@@ -86,6 +86,7 @@ export function ProfileForm({ user, onSaved }: { user: PublicUser; onSaved?: () 
           {t("formTitle")}
         </CardTitle>
         <p className="text-sm text-muted-foreground">{t("optional")}</p>
+        <p className="text-sm text-muted-foreground">{t("publicNote")}</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">

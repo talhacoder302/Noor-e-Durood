@@ -19,6 +19,7 @@ Urdu by default (right-to-left), with English at `/en`. Built for phones and slo
 - Taps are saved on the phone and sent in batches; nothing is lost offline or on a bad connection, and nothing is ever counted twice.
 - Durood Ibrahimi and the short durood in Arabic with Urdu (or English) translation.
 - **Accounts**: sign up with a mobile number and a 4-digit PIN, nothing else. Optional profile: name, majlis (from the admin's list or "other"), age, city. One account works on every phone; durood counted on a phone before signing up moves into the account.
+- **Leaderboard**: the top 50 accounts by all-time count. Tap a name to see that person's profile: majlis, city, age, rank, today / this month / all-time and a 7-day chart.
 - **میرا حساب (My count)**: your own today / week / month / all-time count and a 7-day chart, across all your phones.
 - Share on WhatsApp or the phone's share sheet; a live preview image shows the total.
 - Friday reminder banner, announcements and a gentle "paused" notice from the admin.
@@ -130,6 +131,7 @@ Admin actions are Server Actions, each checking the admin session first.
 
 - Accounts are a mobile number + 4-digit PIN (bcrypt-hashed). Wrong PINs lock the account for 15 minutes after 5 tries, 1 hour after 10, 24 hours after 15. Sessions are random tokens in an httpOnly cookie; only their hash is stored. No OTP yet, so the admin resets forgotten PINs.
 - IPs are never stored, only a salted SHA-256 hash used for rate limits. Device ids are never shown publicly.
+- The leaderboard and public profiles show name, majlis, city, age and counts. Phone numbers are never shown. These pages are `noindex`.
 - Every input is validated with Zod. Totals only change with atomic `$inc`; each submission has a unique id, so retries can't double count.
 - Rate limits: 30 submissions per minute per account and 120 per IP; 30 wrong PINs per 15 minutes and 30 new accounts per hour per IP (successful logins and typos don't count); 5 admin logins per 15 minutes per IP.
 - Admin: bcrypt-checked password, signed httpOnly `SameSite=Strict` session cookie (12 hours).
