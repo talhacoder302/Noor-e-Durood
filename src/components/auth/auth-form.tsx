@@ -129,7 +129,7 @@ export function AuthForm() {
               inputMode="tel"
               autoComplete="tel"
               dir="ltr"
-              placeholder="03001234567"
+              placeholder="03XXXXXXXXX"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="num h-12 text-center text-lg"

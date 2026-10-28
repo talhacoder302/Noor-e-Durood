@@ -106,7 +106,7 @@ Push to `main`. Hostinger rebuilds and restarts automatically (look for the **Au
 | `TurbopackInternalError` mentioning `globals.css` / PostCSS | The build ran with Turbopack. Set the build command to `build` (the npm script uses `next build --webpack`), then Redeploy. |
 | `Invalid environment variables` in logs | The message lists the variable names that are missing or wrong. |
 | `/api/health` says `"db":"down"` | Atlas Network Access (step 1.2), the user's password in `MONGODB_URI`, and that the cluster isn't paused. |
-| Admin panel says to log in with an admin account | Log in with your admin account's number and PIN first. Locked out (forgot PIN, or the role was removed)? On your computer: `npm run admin:account -- 03001234567 --pin 1234`. |
+| Admin panel says to log in with an admin account | Log in with your admin account's number and PIN first. Locked out (forgot PIN, or the role was removed)? On your computer: `npm run admin:account -- 03250062540 --pin 1234`. |
 | Admin password not accepted | `ADMIN_PASSWORD` must be the exact hash, starting `$2b$12$`, with nothing else around it. Wait 15 minutes after 5 wrong tries. |
 | Share links or sitemap show the wrong address | Fix `NEXT_PUBLIC_SITE_URL`, then Redeploy. |
 | Changes to Settings not visible | Notices update within a minute and submissions within about 10 seconds. |

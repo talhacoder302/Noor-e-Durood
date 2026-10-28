@@ -3,9 +3,9 @@
 // that account's login, so if the only admin forgets their PIN or loses the
 // role, fix it here.
 //
-//   npm run admin:account -- 03001234567              make this account an admin
-//   npm run admin:account -- 03001234567 --pin 4827   also set a new PIN (logs it out everywhere)
-//   npm run admin:account -- 03001234567 --remove     take the admin role away
+//   npm run admin:account -- 03250062540              make this account an admin
+//   npm run admin:account -- 03250062540 --pin 4827   also set a new PIN (logs it out everywhere)
+//   npm run admin:account -- 03250062540 --remove     take the admin role away
 //
 // Reads MONGODB_URI and MONGODB_DB from .env.local.
 import bcrypt from "bcryptjs";

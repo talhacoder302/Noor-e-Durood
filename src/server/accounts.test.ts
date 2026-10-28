@@ -42,14 +42,14 @@ describe("signup", () => {
   });
 
   it("treats the same number written differently as taken", async () => {
-    await signup("03001234567", "4827", meta());
+    await signup("03250062540", "4827", meta());
     expect(await signup("+92 300 1234567", "7391", meta())).toEqual({ ok: false, error: "phone_taken" });
   });
 
   it("rejects bad numbers and weak or malformed PINs", async () => {
     expect(await signup("12345", "4827", meta())).toEqual({ ok: false, error: "invalid_phone" });
-    expect(await signup("03001234567", "482", meta())).toEqual({ ok: false, error: "invalid_pin" });
-    expect(await signup("03001234567", "1234", meta())).toEqual({ ok: false, error: "weak_pin" });
+    expect(await signup("03250062540", "482", meta())).toEqual({ ok: false, error: "invalid_pin" });
+    expect(await signup("03250062540", "1234", meta())).toEqual({ ok: false, error: "weak_pin" });
     expect(await User.countDocuments()).toBe(0);
   });
 
@@ -57,7 +57,7 @@ describe("signup", () => {
     const ipHash = "same-ip";
     // Typos and weak PINs don't use up the allowance.
     for (let i = 0; i < 10; i++) await signup("123", "4827", meta({ ipHash }));
-    for (let i = 0; i < 10; i++) await signup("03001234567", "1111", meta({ ipHash }));
+    for (let i = 0; i < 10; i++) await signup("03250062540", "1111", meta({ ipHash }));
 
     const results = [];
     for (let i = 0; i < 31; i++) {
@@ -72,7 +72,7 @@ describe("signup", () => {
 
 describe("login", () => {
   beforeEach(async () => {
-    await signup("03001234567", "4827", meta());
+    await signup("03250062540", "4827", meta());
   });
 
   it("works with the right PIN in any phone format", async () => {
@@ -81,22 +81,22 @@ describe("login", () => {
   });
 
   it("gives the same answer for a wrong PIN and an unknown number", async () => {
-    expect(await login("03001234567", "1111", meta())).toEqual({ ok: false, error: "wrong" });
+    expect(await login("03250062540", "1111", meta())).toEqual({ ok: false, error: "wrong" });
     expect(await login("03009999999", "4827", meta())).toEqual({ ok: false, error: "wrong" });
   });
 
   it("locks after 5 wrong PINs, even for the right one, then unlocks", async () => {
     const results = [];
-    for (let i = 0; i < 5; i++) results.push(await login("03001234567", "0001", meta()));
+    for (let i = 0; i < 5; i++) results.push(await login("03250062540", "0001", meta()));
     expect(results.slice(0, 4).every((r) => !r.ok && r.error === "wrong")).toBe(true);
     expect(results[4]).toEqual({ ok: false, error: "locked", retryAfterMinutes: 15 });
 
-    expect(await login("03001234567", "4827", meta({ now: minutes(5) }))).toMatchObject({
+    expect(await login("03250062540", "4827", meta({ now: minutes(5) }))).toMatchObject({
       ok: false,
       error: "locked",
       retryAfterMinutes: 10,
     });
-    expect(await login("03001234567", "4827", meta({ now: minutes(16) }))).toMatchObject({ ok: true });
+    expect(await login("03250062540", "4827", meta({ now: minutes(16) }))).toMatchObject({ ok: true });
     expect(await User.findOne().lean()).toMatchObject({ failedPins: 0 });
   });
 
@@ -104,7 +104,7 @@ describe("login", () => {
     let now = NOW;
     let last;
     for (let i = 0; i < 10; i++) {
-      last = await login("03001234567", "0001", meta({ now }));
+      last = await login("03250062540", "0001", meta({ now }));
       if (!last.ok && last.error === "locked") now = new Date(now.getTime() + (last.retryAfterMinutes ?? 0) * 60_000 + 1000);
     }
     expect(last).toEqual({ ok: false, error: "locked", retryAfterMinutes: 60 });
@@ -113,7 +113,7 @@ describe("login", () => {
   it("never counts successful logins against the IP", async () => {
     const ipHash = "shared-wifi";
     for (let i = 0; i < 40; i++) {
-      expect(await login("03001234567", "4827", meta({ ipHash }))).toMatchObject({ ok: true });
+      expect(await login("03250062540", "4827", meta({ ipHash }))).toMatchObject({ ok: true });
     }
   });
 
@@ -122,13 +122,13 @@ describe("login", () => {
     for (let i = 0; i < 30; i++) {
       expect(await login(`0300${String(i).padStart(7, "0")}`, "4827", meta({ ipHash }))).toEqual({ ok: false, error: "wrong" });
     }
-    expect(await login("03001234567", "4827", meta({ ipHash }))).toEqual({ ok: false, error: "rate_limited" });
-    expect(await login("03001234567", "4827", meta({ ipHash: "someone-else" }))).toMatchObject({ ok: true });
+    expect(await login("03250062540", "4827", meta({ ipHash }))).toEqual({ ok: false, error: "rate_limited" });
+    expect(await login("03250062540", "4827", meta({ ipHash: "someone-else" }))).toMatchObject({ ok: true });
   });
 
   it("refuses a disabled account", async () => {
     await User.updateOne({}, { $set: { disabled: true } });
-    expect(await login("03001234567", "4827", meta())).toEqual({ ok: false, error: "disabled" });
+    expect(await login("03250062540", "4827", meta())).toEqual({ ok: false, error: "disabled" });
   });
 
   it("moves the phone's earlier durood into the account", async () => {
@@ -139,7 +139,7 @@ describe("login", () => {
       // Someone else's entry from the same phone stays theirs.
       { clientId: randomUUID(), deviceId, count: 99, mode: "tap", day: "2026-10-10", ipHash: "x", userId: "other" },
     ]);
-    const r = await login("03001234567", "4827", meta({ deviceId }));
+    const r = await login("03250062540", "4827", meta({ deviceId }));
     if (!r.ok) throw new Error(r.error);
     expect(r.user.totalCount).toBe(42);
     expect(await Entry.countDocuments({ userId: r.user._id.toString() })).toBe(2);
@@ -149,9 +149,9 @@ describe("login", () => {
 
 describe("sessions", () => {
   it("logs out one phone or all phones", async () => {
-    const a = await signup("03001234567", "4827", meta());
+    const a = await signup("03250062540", "4827", meta());
     if (!a.ok) throw new Error(a.error);
-    const b = await login("03001234567", "4827", meta());
+    const b = await login("03250062540", "4827", meta());
     if (!b.ok) throw new Error(b.error);
 
     await deleteSession(a.token);
@@ -170,18 +170,18 @@ describe("sessions", () => {
 
 describe("PIN and profile", () => {
   it("changes the PIN only with the old one", async () => {
-    const r = await signup("03001234567", "4827", meta());
+    const r = await signup("03250062540", "4827", meta());
     if (!r.ok) throw new Error(r.error);
     const id = r.user._id.toString();
 
     expect(await changePin(id, "0000", "7391")).toEqual({ ok: false, error: "wrong" });
     expect(await changePin(id, "4827", "1111")).toEqual({ ok: false, error: "weak_pin" });
     expect(await changePin(id, "4827", "7391")).toEqual({ ok: true });
-    expect(await login("03001234567", "7391", meta())).toMatchObject({ ok: true });
+    expect(await login("03250062540", "7391", meta())).toMatchObject({ ok: true });
   });
 
   it("saves the optional profile, including 'other' majlis", async () => {
-    const r = await signup("03001234567", "4827", meta());
+    const r = await signup("03250062540", "4827", meta());
     if (!r.ok) throw new Error(r.error);
     const id = r.user._id.toString();
     const m = await Majlis.create({ name: "مجلس لاہور", order: 1 });
@@ -198,7 +198,7 @@ describe("PIN and profile", () => {
   });
 
   it("refuses an unknown or inactive majlis", async () => {
-    const r = await signup("03001234567", "4827", meta());
+    const r = await signup("03250062540", "4827", meta());
     if (!r.ok) throw new Error(r.error);
     const inactive = await Majlis.create({ name: "پرانی", active: false });
     expect(

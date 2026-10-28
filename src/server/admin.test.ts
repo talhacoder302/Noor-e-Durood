@@ -120,7 +120,7 @@ describe("removeEntry", () => {
 
 describe("accounts", () => {
   it("disabling stops submissions and logs the user out everywhere", async () => {
-    const s = await signup("03001234567", "4827", { ipHash: "ip", userAgentShort: "" });
+    const s = await signup("03250062540", "4827", { ipHash: "ip", userAgentShort: "" });
     if (!s.ok) throw new Error(s.error);
     const id = s.user._id.toString();
 
@@ -145,15 +145,15 @@ describe("accounts", () => {
   });
 
   it("an admin PIN reset unlocks the account and logs it out", async () => {
-    const s = await signup("03001234567", "4827", { ipHash: "ip", userAgentShort: "" });
+    const s = await signup("03250062540", "4827", { ipHash: "ip", userAgentShort: "" });
     if (!s.ok) throw new Error(s.error);
     const id = s.user._id.toString();
-    for (let i = 0; i < 5; i++) await login("03001234567", "0001", { ipHash: `ip${i}`, userAgentShort: "" });
+    for (let i = 0; i < 5; i++) await login("03250062540", "0001", { ipHash: `ip${i}`, userAgentShort: "" });
 
     expect(await resetUserPin(id, "12")).toEqual({ ok: false, error: "invalid_pin" });
     expect(await resetUserPin(id, "5163")).toEqual({ ok: true });
     expect(await readSession(s.token)).toBeNull();
-    expect(await login("03001234567", "5163", { ipHash: "ip9", userAgentShort: "" })).toMatchObject({ ok: true });
+    expect(await login("03250062540", "5163", { ipHash: "ip9", userAgentShort: "" })).toMatchObject({ ok: true });
   });
 
   it("finds users by phone in any format or by name", async () => {

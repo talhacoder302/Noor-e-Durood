@@ -23,7 +23,7 @@ export function normalizePhone(input: string): string | null {
     digits = s.slice(1);
     if (!/^\d+$/.test(digits)) return null;
   } else if (/^0\d{10}$/.test(s)) {
-    digits = `92${s.slice(1)}`; // 03001234567
+    digits = `92${s.slice(1)}`; // 03250062540
   } else if (/^3\d{9}$/.test(s)) {
     digits = `92${s}`; // 3001234567
   } else if (/^92\d{10}$/.test(s)) {

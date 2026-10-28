@@ -56,7 +56,7 @@ async function Entries({ searchParams, locale }: { searchParams: Promise<SearchP
         </label>
         <label className="space-y-1 text-xs">
           <span>{t("filterPhone")}</span>
-          <Input name="phone" type="tel" defaultValue={f.phone} dir="ltr" className="h-9" placeholder="03001234567" />
+          <Input name="phone" type="tel" defaultValue={f.phone} dir="ltr" className="h-9" placeholder="03250062540" />
         </label>
         {/* Kept when coming from a link (a user's or an old device's entries). */}
         {f.user && <input type="hidden" name="user" value={f.user} />}

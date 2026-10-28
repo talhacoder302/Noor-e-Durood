@@ -284,7 +284,7 @@
     "loggedOut": "Logged out",
     "loggedOutAll": "Logged out on all phones",
     "errors": {
-      "invalid_phone": "That mobile number doesn't look right, e.g. 03001234567",
+      "invalid_phone": "That mobile number doesn't look right, e.g. 03250062540",
       "invalid_pin": "The PIN must be 4 digits",
       "weak_pin": "That PIN is too easy (like 1234 or 0000). Please choose another.",
       "pin_mismatch": "The two PINs don't match",

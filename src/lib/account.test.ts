@@ -5,7 +5,7 @@ import { isValidPinFormat, isWeakPin, normalizePin } from "./pin";
 describe("normalizePhone", () => {
   it("treats every way of writing a Pakistani number as the same", () => {
     for (const input of [
-      "03001234567",
+      "03250062540",
       "0300-1234567",
       "0300 123 4567",
       "3001234567",
@@ -25,7 +25,7 @@ describe("normalizePhone", () => {
   });
 
   it("rejects things that aren't phone numbers", () => {
-    for (const input of ["", "abc", "12345", "0300123", "030012345678", "+92 300 12", "+0123456789", "92-300"]) {
+    for (const input of ["", "abc", "12345", "0300123", "032500625408", "+92 300 12", "+0123456789", "92-300"]) {
       expect(normalizePhone(input), input).toBeNull();
     }
   });
