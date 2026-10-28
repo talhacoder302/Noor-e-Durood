@@ -19,8 +19,8 @@ import {
   rollbackOptimistic,
 } from "@/components/counter/totals-store";
 
-const AUTO_FLUSH_MS = 30_000;
-const MAX_BACKOFF_MS = 5 * 60_000;
+const AUTO_FLUSH_MS = 10 * 60_000;
+const MAX_BACKOFF_MS = 60 * 60_000;
 
 export type TasbeehSnapshot = {
   queue: QueueState;
