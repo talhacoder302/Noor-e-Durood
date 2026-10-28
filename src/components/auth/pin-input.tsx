@@ -33,7 +33,7 @@ export function PinInput({
         inputMode="numeric"
         autoComplete={autoComplete}
         maxLength={PIN_LENGTH}
-        placeholder="••••"
+        placeholder="XXXX"
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, PIN_LENGTH))}
         className={cn(

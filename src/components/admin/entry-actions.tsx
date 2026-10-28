@@ -154,7 +154,7 @@ export function ResetPinButton({ userId, label }: { userId: string; label: strin
       hidden={{ userId }}
       action={resetPinAction}
       successMessage={t("pinReset")}
-      field={{ name: "pin", minLength: 4, maxLength: 4, numeric: true, placeholder: "••••" }}
+      field={{ name: "pin", minLength: 4, maxLength: 4, numeric: true, placeholder: "XXXX" }}
       destructive={false}
     />
   );
